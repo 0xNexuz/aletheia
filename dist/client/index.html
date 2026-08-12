@@ -183,38 +183,53 @@
     <section class="eligibility section-pad" id="eligibility">
       <div class="eligibility-inner">
         <div class="eligibility-copy reveal">
-          <p class="eyebrow">Private eligibility preview</p>
-          <h2>See what a proof<br>can reveal.</h2>
-          <p>This demonstration keeps every answer in your browser. It shows how Alethia converts sensitive facts into a minimal eligibility result.</p>
-          <div class="privacy-note"><span>◉</span><p><strong>Nothing here is submitted.</strong><br>Your answers disappear when you refresh this page.</p></div>
+          <p class="eyebrow">Working claim lab</p>
+          <h2>Make one private,<br>verifiable claim.</h2>
+          <p>Your answers stay on this device. Alethia sends only an eligibility commitment, a program-specific duplicate guard, and a wallet-derived public reference.</p>
+          <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Test mode</strong></div><small id="network-detail">Browser proofs + Alethia signed ledger</small></div>
+          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>The deployed flow uses an Alethia test wallet unless a compatible Midnight provider is available.</p></div>
         </div>
         <form class="proof-form reveal" id="proof-form">
+          <div class="claim-progress" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></div>
           <div class="form-step active" data-step="1">
-            <span class="step-count">01 / 03</span>
+            <span class="step-count">01 / 04 · CONNECT</span>
+            <label>Choose how to protect this claim.</label>
+            <p class="step-help">A wallet creates a private secret on your device. It stops a second claim without publishing your identity.</p>
+            <div class="wallet-options">
+              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Connect Midnight wallet</b><small>Uses an injected compatible provider when available</small></button>
+              <button class="wallet-choice recommended" type="button" data-wallet="test"><b>Use Alethia test wallet</b><small>Creates a local, non-chain identity for this live demo</small></button>
+            </div>
+            <p class="inline-status" id="wallet-status" aria-live="polite"></p>
+          </div>
+          <div class="form-step" data-step="2">
+            <span class="step-count">02 / 04 · ELIGIBILITY</span>
             <label>Is your household currently affected by an emergency?</label>
             <div class="choice-grid"><button type="button" data-value="yes">Yes</button><button type="button" data-value="no">No</button></div>
           </div>
-          <div class="form-step" data-step="2">
-            <span class="step-count">02 / 03</span>
+          <div class="form-step" data-step="3">
+            <span class="step-count">03 / 04 · UNIQUENESS</span>
             <label>Are you already receiving this specific benefit?</label>
             <div class="choice-grid"><button type="button" data-value="yes">Yes</button><button type="button" data-value="no">No</button></div>
           </div>
-          <div class="form-step" data-step="3">
-            <span class="step-count">03 / 03</span>
-            <label>Would you like to generate the minimum proof?</label>
-            <button class="pill generate-proof" type="button">Generate private proof</button>
+          <div class="form-step" data-step="4">
+            <span class="step-count">04 / 04 · REVIEW</span>
+            <label>Generate and submit the minimum proof?</label>
+            <div class="disclosure-preview"><span>Shared</span><b>eligible · unique · commitment</b><span>Hidden</span><b>answers · identity · wallet secret</b></div>
+            <button class="pill generate-proof" type="button">Generate &amp; submit claim</button>
+            <p class="inline-status" id="claim-status" aria-live="polite"></p>
           </div>
           <div class="proof-result" aria-live="polite">
-            <div class="proof-ring">✓</div>
-            <p class="eyebrow">Only this is shared</p>
-            <h3>Eligibility confirmed</h3>
-            <ul><li>Name <b>hidden</b></li><li>Address <b>hidden</b></li><li>Documents <b>hidden</b></li><li>Program status <b>eligible</b></li></ul>
-            <button class="text-link restart-proof" type="button">Try again ↻</button>
+            <div class="proof-ring">✓</div><p class="eyebrow">Signed receipt issued</p><h3>Claim accepted</h3>
+            <ul><li>Eligibility <b>confirmed</b></li><li>Duplicate check <b>passed</b></li><li>Private fields stored <b>zero</b></li><li>Receipt <b id="receipt-short">—</b></li></ul>
+            <div class="receipt-actions"><button class="pill pill-small copy-receipt" type="button">Copy receipt</button><button class="pill pill-small pill-outline verify-receipt" type="button">Verify receipt</button></div>
+            <p class="verification-status" id="verification-status"></p><button class="text-link restart-proof" type="button">Start another claim ↻</button>
+          </div>
+          <div class="proof-result proof-denied" aria-live="polite">
+            <div class="proof-ring">!</div><p class="eyebrow">No claim submitted</p><h3>Not eligible yet</h3><p>Your private answers stayed on this device. No receipt or duplicate marker was created.</p><button class="text-link restart-proof" type="button">Review answers ↻</button>
           </div>
         </form>
       </div>
     </section>
-
     <section class="questions section-pad" id="questions">
       <div class="section-heading reveal"><p class="eyebrow">For field teams and program leaders</p><h2>Have any questions?</h2><p>Tell us what you need to verify. We’ll map the smallest possible disclosure.</p></div>
       <div class="question-layout">

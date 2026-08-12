@@ -109,11 +109,11 @@ em { font-family: var(--text-serif); font-weight: 400; }
 .path-copy p { color: var(--muted); font-family: var(--text-serif); font-size: 13px; }
 .path-copy a { display: inline-block; margin-top: 5px; color: var(--teal-dark); font-size: 10px; font-weight: 700; border-bottom: 1px solid currentColor; }
 .path-art { position: relative; min-height: 320px; background-image: url("assets/aletheia-landscape.png"); background-size: 250%; background-repeat: no-repeat; border-radius: 55% 45% 50% 45%; filter: saturate(.8); }
-.art-eligibility { background-position: 0 80%; clip-path: polygon(3% 15%, 88% 2%, 100% 80%, 15% 100%); }
-.art-claim { background-position: 48% 85%; clip-path: polygon(0 10%, 100% 0, 91% 90%, 8% 100%); }
-.art-impact { background-position: 100% 76%; clip-path: polygon(7% 0, 100% 15%, 92% 100%, 0 86%); }
-.art-audit { background-position: 72% 90%; clip-path: polygon(0 9%, 90% 0, 100% 86%, 12% 100%); }
-.art-field { background-position: 18% 90%; clip-path: polygon(7% 5%, 96% 0, 100% 87%, 0 100%); }
+.art-eligibility { background-image: url("assets/path-eligibility.png"); background-size: cover; background-position: center; clip-path: polygon(3% 15%, 88% 2%, 100% 80%, 15% 100%); }
+.art-claim { background-image: url("assets/path-claim.png"); background-size: cover; background-position: center; clip-path: polygon(0 10%, 100% 0, 91% 90%, 8% 100%); }
+.art-impact { background-image: url("assets/path-impact.png"); background-size: cover; background-position: center; clip-path: polygon(7% 0, 100% 15%, 92% 100%, 0 86%); }
+.art-audit { background-image: url("assets/path-audit.png"); background-size: cover; background-position: center; clip-path: polygon(0 9%, 90% 0, 100% 86%, 12% 100%); }
+.art-field { background-image: url("assets/path-field.png"); background-size: cover; background-position: center; clip-path: polygon(7% 5%, 96% 0, 100% 87%, 0 100%); }
 .map-pin { position: absolute; top: 45%; left: 52%; width: 25px; height: 34px; display: grid; place-items: center; color: var(--red); font-size: 23px; text-shadow: 0 1px 0 #fff; }
 .map-pin::after { content: ""; position: absolute; bottom: 0; width: 1px; height: 13px; background: var(--ink); }
 .pathway-cta { max-width: 850px; margin: 130px auto 0; display: grid; grid-template-columns: .7fr 1.3fr; align-items: center; padding: 50px 65px; background: var(--yellow); }
@@ -287,3 +287,29 @@ em { font-family: var(--text-serif); font-weight: 400; }
   *,*::before,*::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Functional claim lab */
+.network-card { margin-top: 28px; padding: 17px 18px; background: rgba(255,250,241,.7); border: 1px solid var(--line); }
+.network-card > div { display: flex; align-items: center; gap: 9px; }
+.network-card small { display: block; margin: 7px 0 0 17px; color: var(--muted); font-size: 9px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #d4a62a; box-shadow: 0 0 0 4px rgba(212,166,42,.13); }
+.status-dot.live { background: var(--teal); box-shadow: 0 0 0 4px rgba(55,183,162,.13); }
+.claim-progress { display: flex; gap: 7px; }
+.claim-progress i { flex: 1; height: 3px; background: #e4ded2; }
+.claim-progress i.active { background: var(--teal); }
+.step-help { max-width: 520px; margin: -25px 0 22px; color: var(--muted); font-family: var(--text-serif); font-size: 11px; }
+.wallet-options { display: grid; gap: 9px; }
+.wallet-choice { position: relative; padding: 17px 18px; border: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; }
+.wallet-choice:hover { border-color: var(--teal-dark); background: rgba(55,183,162,.06); }
+.wallet-choice b,.wallet-choice small { display: block; }
+.wallet-choice b { font-size: 12px; }.wallet-choice small { margin-top: 5px; color: var(--muted); font-size: 9px; }
+.wallet-choice.recommended::after { content: "READY"; position: absolute; top: 12px; right: 12px; color: var(--teal-dark); font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+.inline-status { min-height: 18px; margin: 12px 0 0; color: var(--teal-dark); font-size: 10px; }
+.disclosure-preview { display: grid; grid-template-columns: 75px 1fr; gap: 9px 15px; margin: -15px 0 28px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 10px; }
+.disclosure-preview span { color: var(--muted); }.disclosure-preview b { font-weight: 600; }
+.proof-denied .proof-ring { border-color: var(--red); color: var(--red); }
+.proof-denied > p:not(.eyebrow) { max-width: 390px; margin: 0 auto 22px; font-family: var(--text-serif); font-size: 11px; }
+.receipt-actions { display: flex; justify-content: center; gap: 8px; }
+.verification-status { min-height: 18px; margin: 13px 0 5px; color: var(--teal-dark); font-size: 10px; }
+.pill:disabled { cursor: wait; opacity: .55; transform: none; }
+@media (max-width: 640px) { .receipt-actions { flex-direction: column; }.receipt-actions .pill { width: 100%; }.wallet-choice.recommended::after { display: none; } }

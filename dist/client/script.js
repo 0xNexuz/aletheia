@@ -17,13 +17,60 @@ dots.forEach((dot, index) => dot.addEventListener('click', () => showQuote(index
 const modal = document.querySelector('#story-modal');
 const openModalButton = document.querySelector('.film-preview');
 const closeModalButton = document.querySelector('.modal-close');
-function openModal() { modal.hidden = false; document.body.classList.add('modal-open'); closeModalButton.focus(); }
-function closeModal() { modal.hidden = true; document.body.classList.remove('modal-open'); openModalButton.focus(); }
+const storyScenes = [...document.querySelectorAll('.story-scene')];
+const storyPlay = document.querySelector('.story-play');
+const storyProgress = document.querySelector('.story-progress i');
+const storyCounter = document.querySelector('.story-counter');
+let storyStartedAt = 0;
+let storyElapsed = 0;
+let storyPlaying = false;
+let storyFrame = 0;
+const STORY_DURATION = 60000;
+
+function formatStoryTime(milliseconds) { const seconds = Math.min(60, Math.floor(milliseconds / 1000)); return `00:${String(seconds).padStart(2, '0')}`; }
+function renderStory(elapsed) {
+  const sceneIndex = Math.min(storyScenes.length - 1, Math.floor((elapsed / STORY_DURATION) * storyScenes.length));
+  storyScenes.forEach((scene, index) => scene.classList.toggle('active', index === sceneIndex));
+  storyProgress.style.width = `${Math.min(100, (elapsed / STORY_DURATION) * 100)}%`;
+  storyCounter.textContent = `${formatStoryTime(elapsed)} / 01:00`;
+}
+function storyTick(now) {
+  if (!storyPlaying) return;
+  storyElapsed = Math.min(STORY_DURATION, now - storyStartedAt);
+  renderStory(storyElapsed);
+  if (storyElapsed >= STORY_DURATION) { storyPlaying = false; storyPlay.textContent = 'Replay'; return; }
+  storyFrame = requestAnimationFrame(storyTick);
+}
+function playStory(reset = false) {
+  if (reset || storyElapsed >= STORY_DURATION) storyElapsed = 0;
+  storyPlaying = true; storyPlay.textContent = 'Pause'; storyStartedAt = performance.now() - storyElapsed; cancelAnimationFrame(storyFrame); storyFrame = requestAnimationFrame(storyTick);
+}
+function pauseStory() { storyPlaying = false; storyPlay.textContent = 'Play'; cancelAnimationFrame(storyFrame); }
+function openModal() { modal.hidden = false; document.body.classList.add('modal-open'); renderStory(0); playStory(true); closeModalButton.focus(); }
+function closeModal() { pauseStory(); modal.hidden = true; document.body.classList.remove('modal-open'); openModalButton.focus(); }
 openModalButton?.addEventListener('click', openModal); closeModalButton?.addEventListener('click', closeModal);
+storyPlay?.addEventListener('click', () => storyPlaying ? pauseStory() : playStory(storyElapsed >= STORY_DURATION));
+document.querySelector('.story-replay')?.addEventListener('click', () => playStory(true));
 modal?.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modal && !modal.hidden) closeModal(); });
-modal?.querySelector('.pill')?.addEventListener('click', closeModal);
+modal?.querySelector('.story-controls a')?.addEventListener('click', closeModal);
 
+async function loadMetrics() {
+  try {
+    const response = await fetch('/api/stats', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Metrics unavailable');
+    const data = await response.json();
+    document.querySelector('#metric-valid').textContent = Number(data.validClaims).toLocaleString();
+    document.querySelector('#metric-duplicates').textContent = Number(data.duplicateClaimsStopped).toLocaleString();
+    document.querySelector('#metric-private').textContent = Number(data.privateFieldsPublished).toLocaleString();
+    document.querySelector('#metric-success').textContent = data.protocolSuccess;
+  } catch {
+    document.querySelector('#metric-valid').textContent = '—';
+    document.querySelector('#metric-duplicates').textContent = '—';
+    document.querySelector('#metric-success').textContent = '—';
+  }
+}
+loadMetrics();
 const encoder = new TextEncoder();
 const PROGRAM_ID = 'emergency-relief-2026';
 const proofSteps = [...document.querySelectorAll('.form-step')];
@@ -91,8 +138,10 @@ async function createClaim() {
     proofSteps.forEach((step) => step.classList.remove('active')); progress.forEach((bar) => bar.classList.add('active'));
     document.querySelector('#receipt-short').textContent = `${data.receipt.id.slice(0, 8)}…`;
     acceptedResult.classList.add('active');
+    loadMetrics();
   } catch (error) {
     claimStatus.textContent = error.code === 'DUPLICATE_CLAIM' ? 'This wallet has already claimed this program benefit. No second receipt was issued.' : error.message;
+    if (error.code === 'DUPLICATE_CLAIM') loadMetrics();
   } finally { generateButton.disabled = false; }
 }
 generateButton?.addEventListener('click', createClaim);
@@ -119,5 +168,5 @@ document.querySelectorAll('.restart-proof').forEach((button) => button.addEventL
 document.querySelector('#contact-form')?.addEventListener('submit', async (event) => {
   event.preventDefault(); const form = event.currentTarget; const status = form.querySelector('.form-status'); const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true; status.textContent = 'Sending…';
-  try { const payload = Object.fromEntries(new FormData(form)); const response = await fetch('/api/inquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Message could not be sent.'); status.textContent = 'Received. Your reference is ' + data.reference + '.'; form.reset(); } catch (error) { status.textContent = error.message; } finally { submit.disabled = false; }
+  try { const payload = Object.fromEntries(new FormData(form)); const response = await fetch('/api/inquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Message could not be sent.'); status.textContent = 'Saved for the Alethia site owner. Your reference is ' + data.reference + '. No email notification is sent yet.'; form.reset(); } catch (error) { status.textContent = error.message; } finally { submit.disabled = false; }
 });

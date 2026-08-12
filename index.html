@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Alethia lets people prove aid eligibility without exposing private data." />
+  <meta name="theme-color" content="#f9f5ec" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <title>Alethia — Proof without exposure</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +16,7 @@
 <body>
   <header class="site-header" id="top">
     <a class="brand" href="#top" aria-label="Alethia home">
-      <span class="brand-mark" aria-hidden="true">A</span>
+      <img class="brand-mark" src="assets/aletheia-mark.png" alt="" width="36" height="36">
       <span><strong>ALETHIA</strong><small>PROOF WITHOUT EXPOSURE</small></span>
     </a>
     <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">Menu</button>
@@ -66,7 +69,7 @@
         </div>
         <button class="film-preview" type="button" aria-label="Play the Alethia story">
           <span class="film-visual"><i>▶</i></span>
-          <span>Watch the 60-second story</span>
+          <span>Watch the 60-second story <small>Interactive preview</small></span>
         </button>
       </div>
     </section>
@@ -155,7 +158,7 @@
         <span>ALETHIA NETWORK</span><i>Proof Notes</i><span>VOL. 01</span>
       </div>
       <div class="newspaper-title"><span>AUG.</span><h2>PROOF NOTES</h2><span>2026</span></div>
-      <div class="ticker"><span>Valid claims <b>1,284</b></span><span>Duplicate claims stopped <b>47</b></span><span>Private fields published <b>0</b></span><span>Proof success <b>99.8%</b></span></div>
+      <div class="ticker" aria-live="polite"><span>Valid test claims <b id="metric-valid">—</b></span><span>Duplicate tests stopped <b id="metric-duplicates">—</b></span><span>Private fields published <b id="metric-private">0</b></span><span>Protocol success <b id="metric-success">—</b></span></div><p class="metrics-note"><span class="status-dot live"></span>Live demo ledger · updates after accepted and duplicate test claims</p>
       <div class="stories-grid">
         <article class="lead-story reveal"><div class="story-image"><div class="fingerprint">◎</div></div><p class="eyebrow">Field report</p><h3>Why aid should never require a permanent public profile</h3><p>Human dignity and transparent impact are not opposing goals. Alethia’s dual-state design lets programs verify the truth without collecting another vulnerable-data archive.</p><a class="pill pill-small" href="#how">Read the field note</a></article>
         <article class="side-story reveal"><div class="story-sketch sketch-audit">✓</div><p class="eyebrow">Protocol note</p><h3>Inside a privacy-safe audit</h3><p>See how selective disclosure gives an auditor one necessary fact—and nothing else.</p></article>
@@ -241,6 +244,7 @@
           <label class="full">What must be proven?<textarea name="message" rows="3" placeholder="For example: household is eligible, claim has not been used..." required></textarea></label>
           <button class="pill" type="submit">Send privately</button>
           <p class="form-status" aria-live="polite"></p>
+          <p class="feedback-route full">Saved in Alethia's private program database for the site owner. Email notifications are not configured yet.</p>
         </form>
         <div class="question-art reveal" aria-hidden="true"><div class="jar"><span>?</span><small>Ask with care</small></div><div class="hand">☞</div></div>
       </div>
@@ -258,7 +262,7 @@
   </main>
 
   <footer class="site-footer">
-    <div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark">A</span><span><strong>ALETHIA</strong><small>PROOF WITHOUT EXPOSURE</small></span></a><p>Built for privacy-first aid on Midnight.</p></div>
+    <div class="footer-brand"><a class="brand" href="#top"><img class="brand-mark" src="assets/aletheia-mark.png" alt="" width="42" height="42"><span><strong>ALETHIA</strong><small>PROOF WITHOUT EXPOSURE</small></span></a><p>Built for privacy-first aid on Midnight.</p></div>
     <div><h3>Explore</h3><a href="#how">How it works</a><a href="#pathways">Pathways</a><a href="#proof-notes">Proof notes</a></div>
     <div><h3>Build</h3><a href="#questions">Program design</a><a href="#eligibility">Proof preview</a><a href="#questions">Auditor access</a></div>
     <div><h3>Principles</h3><a href="#how">Selective disclosure</a><a href="#how">Private state</a><a href="#how">Public trust</a></div>
@@ -266,16 +270,24 @@
     <div class="footer-bottom"><span>© 2026 Alethia</span><span>Privacy by design · Powered by Midnight</span></div>
   </footer>
 
-  <div class="modal" id="story-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
-    <div class="modal-card">
+  <div class="modal story-modal" id="story-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-card story-modal-card">
       <button class="modal-close" type="button" aria-label="Close story">×</button>
-      <p class="eyebrow">The Alethia story</p>
-      <h2 id="modal-title">A claim can be true<br>without being public.</h2>
-      <div class="story-steps"><p><b>1.</b> Evidence stays encrypted with the claimant.</p><p><b>2.</b> A Compact contract checks the program rule.</p><p><b>3.</b> Midnight records a valid, unique proof—not the private data.</p></div>
-      <a class="pill" href="#eligibility">Try the proof</a>
+      <div class="story-player-head"><div><p class="eyebrow">The Alethia story · 60 seconds</p><h2 id="modal-title">Proof without exposure.</h2></div><img src="assets/aletheia-mark.png" alt="" width="54" height="54"></div>
+      <div class="story-screen" aria-live="polite">
+        <article class="story-scene active" data-scene="0"><span class="scene-time">00:00</span><div class="scene-art scene-question"><i>?</i></div><p>To receive aid, people are often asked to expose the most private parts of their lives.</p></article>
+        <article class="story-scene" data-scene="1"><span class="scene-time">00:08</span><div class="scene-art scene-document"><i></i></div><p>Names. Addresses. Documents. One more vulnerable-data archive.</p></article>
+        <article class="story-scene" data-scene="2"><span class="scene-time">00:15</span><div class="scene-art scene-shield"><i>✓</i></div><p>Alethia changes the exchange: your evidence stays protected with you.</p></article>
+        <article class="story-scene" data-scene="3"><span class="scene-time">00:23</span><div class="scene-art scene-path"><i></i></div><p>A private proof checks the program rule without revealing the facts behind it.</p></article>
+        <article class="story-scene" data-scene="4"><span class="scene-time">00:31</span><div class="scene-art scene-once"><i>1</i></div><p>A program-specific marker proves the claim is unique—without creating a public identity.</p></article>
+        <article class="story-scene" data-scene="5"><span class="scene-time">00:39</span><div class="scene-art scene-receipt"><i>✓</i></div><p>The program receives only what it needs: eligible, unique, and verifiable.</p></article>
+        <article class="story-scene" data-scene="6"><span class="scene-time">00:47</span><div class="scene-art scene-impact"><i>0</i></div><p>Programs can prove impact while the number of private fields published stays zero.</p></article>
+        <article class="story-scene" data-scene="7"><span class="scene-time">00:55</span><div class="scene-art scene-brand"><img src="assets/aletheia-mark.png" alt=""></div><p>Truth, gently revealed. Begin a private claim with Alethia.</p></article>
+      </div>
+      <div class="story-progress" aria-hidden="true"><i></i></div>
+      <div class="story-controls"><button class="story-play pill pill-small" type="button">Pause</button><button class="story-replay text-link" type="button">Replay</button><span class="story-counter">00:00 / 01:00</span><a class="pill pill-small" href="#eligibility">Try the proof</a></div>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

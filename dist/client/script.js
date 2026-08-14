@@ -63,11 +63,11 @@ async function loadMetrics() {
     document.querySelector('#metric-valid').textContent = Number(data.validClaims).toLocaleString();
     document.querySelector('#metric-duplicates').textContent = Number(data.duplicateClaimsStopped).toLocaleString();
     document.querySelector('#metric-private').textContent = Number(data.privateFieldsPublished).toLocaleString();
-    document.querySelector('#metric-success').textContent = data.protocolSuccess;
+    document.querySelector('#metric-remaining').textContent = Number(data.remainingSupplies).toLocaleString();
   } catch {
     document.querySelector('#metric-valid').textContent = '—';
     document.querySelector('#metric-duplicates').textContent = '—';
-    document.querySelector('#metric-success').textContent = '—';
+    document.querySelector('#metric-remaining').textContent = '—';
   }
 }
 loadMetrics();
@@ -94,7 +94,7 @@ async function connectTestWallet() {
   claim.walletKind = 'aletheia-test'; claim.walletMaterial = secret;
   const id = await sha256(secret);
   walletStatus.textContent = `Test wallet ready · ${id.slice(0, 8)}…${id.slice(-6)}`;
-  setNetwork(false, 'Alethia test mode', 'Local wallet + signed Alethia claim ledger');
+  setNetwork(false, 'Signed prototype', 'Local attestation + signed Alethia receipt ledger');
   setTimeout(() => showProofStep(1), 350);
 }
 
@@ -109,7 +109,7 @@ async function connectMidnightWallet() {
     if (!connection || !addresses?.shieldedAddress) throw new Error('Wallet did not return a shielded address.');
     claim.walletKind = 'midnight-preprod'; claim.walletMaterial = addresses.shieldedAddress;
     walletStatus.textContent = `Midnight connected · ${addresses.shieldedAddress.slice(0, 8)}…${addresses.shieldedAddress.slice(-6)}`;
-    setNetwork(true, 'Midnight Preprod wallet', 'Wallet connected · claims recorded in Alethia signed ledger');
+    setNetwork(true, 'Midnight wallet connected', 'Wallet material stays local · no on-chain proof is submitted yet');
     setTimeout(() => showProofStep(1), 350);
   } catch (error) { walletStatus.textContent = error?.message || 'Midnight wallet connection was declined.'; }
 }
@@ -128,10 +128,10 @@ async function createClaim() {
   if (!eligible) { proofSteps.forEach((step) => step.classList.remove('active')); deniedResult.classList.add('active'); return; }
   generateButton.disabled = true; claimStatus.textContent = 'Creating commitment and checking uniqueness…';
   try {
-    const walletId = await sha256(`aletheia-wallet-v1:${claim.walletMaterial}`);
     const nullifier = await sha256(`aletheia-nullifier-v1:${PROGRAM_ID}:${claim.walletMaterial}`);
-    const commitment = await sha256(JSON.stringify({ domain: 'aletheia-claim-v1', programId: PROGRAM_ID, emergency: true, receiving: false, walletId }));
-    const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId: PROGRAM_ID, walletId, nullifier, commitment, walletKind: claim.walletKind }) });
+    const nonce = bytesToBase64(crypto.getRandomValues(new Uint8Array(24)));
+    const commitment = await sha256(JSON.stringify({ domain: 'aletheia-claim-v2', programId: PROGRAM_ID, eligible: true, nonce }));
+    const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId: PROGRAM_ID, nullifier, commitment, walletKind: claim.walletKind }) });
     const data = await response.json();
     if (!response.ok) throw Object.assign(new Error(data.error || 'Claim could not be recorded.'), { code: data.code });
     claim.receipt = data;

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Alethia lets people prove aid eligibility without exposing private data." />
   <meta name="theme-color" content="#f9f5ec" />
+  <meta property="og:title" content="Alethia - Proof without exposure" />
+  <meta property="og:description" content="A privacy-first prototype for aid eligibility, one-time claims, and verifiable receipts." />
+  <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <title>Alethia — Proof without exposure</title>
@@ -63,7 +66,7 @@
           <span class="sketch-seal" aria-hidden="true">✣</span>
           <p class="eyebrow">The Alethia story</p>
           <h2>Get support on<br>your own terms.</h2>
-          <p>Most aid systems ask vulnerable people to trade privacy for access. Alethia changes the exchange. Your evidence stays encrypted on your device while a zero-knowledge proof confirms only what a program needs to know.</p>
+          <p>Most aid systems ask vulnerable people to trade privacy for access. Alethia changes the exchange. In this working prototype, private answers remain on your device while a signed commitment records only the minimum program outcome.</p>
           <p>No public identity. No visible documents. No permanent trail of your circumstances.</p>
           <p class="signature">Truth, gently revealed.</p>
         </div>
@@ -113,7 +116,7 @@
       <div class="journey-line" aria-hidden="true"></div>
       <article class="pathway pathway-right reveal">
         <div class="path-art art-eligibility"><span class="map-pin">●</span></div>
-        <div class="path-copy"><span>01</span><h3>Private Eligibility</h3><p>Answer a program’s requirements locally. Alethia converts your private evidence into a simple yes-or-no proof without sending the underlying data.</p><a href="#eligibility">Explore this path →</a></div>
+        <div class="path-copy"><span>01</span><h3>Private Eligibility</h3><p>Answer a program’s requirements locally. The current demo converts those answers into a simple yes-or-no attestation without sending the underlying responses.</p><a href="#eligibility">Explore this path →</a></div>
       </article>
       <article class="pathway pathway-left reveal">
         <div class="path-art art-claim"><span class="map-pin">●</span></div>
@@ -129,7 +132,7 @@
       </article>
       <article class="pathway pathway-right reveal">
         <div class="path-art art-field"><span class="map-pin">●</span></div>
-        <div class="path-copy"><span>05</span><h3>Field-ready Access</h3><p>Capture an encrypted claim where connectivity is limited, then synchronize the proof when a connection returns.</p><a href="#questions">Bring Alethia to the field →</a></div>
+        <div class="path-copy"><span>05</span><h3>Field-ready Access</h3><p>A planned field mode will prepare encrypted claims offline and synchronize them when connectivity returns.</p><a href="#questions">Bring Alethia to the field →</a></div>
       </article>
 
       <div class="pathway-cta reveal">
@@ -149,7 +152,7 @@
         <article class="guidance-card reveal"><span>◉</span><h3>What does Alethia store?</h3><p>Your program receipt and public proof status. Sensitive documents remain encrypted in your private state, not on a public ledger.</p></article>
         <article class="guidance-card reveal"><span>⌁</span><h3>Can claims be linked?</h3><p>No public profile is required. Program-specific nullifiers stop repeat claims without creating a reusable identifier across programs.</p></article>
         <article class="guidance-card reveal"><span>✦</span><h3>Who sees my evidence?</h3><p>You decide. A verifier receives only the fact the policy requests, such as “eligible,” never the documents used to prove it.</p></article>
-        <article class="guidance-card reveal"><span>↻</span><h3>What if I’m offline?</h3><p>Field workers can prepare an encrypted claim locally. The proof submits when connectivity returns, preserving the original record.</p></article>
+        <article class="guidance-card reveal"><span>↻</span><h3>What if I’m offline?</h3><p>Offline synchronization is on the product roadmap. This hosted prototype currently requires a connection to submit its signed commitment.</p></article>
       </div>
     </section>
 
@@ -158,11 +161,11 @@
         <span>ALETHIA NETWORK</span><i>Proof Notes</i><span>VOL. 01</span>
       </div>
       <div class="newspaper-title"><span>AUG.</span><h2>PROOF NOTES</h2><span>2026</span></div>
-      <div class="ticker" aria-live="polite"><span>Valid test claims <b id="metric-valid">—</b></span><span>Duplicate tests stopped <b id="metric-duplicates">—</b></span><span>Private fields published <b id="metric-private">0</b></span><span>Protocol success <b id="metric-success">—</b></span></div><p class="metrics-note"><span class="status-dot live"></span>Live demo ledger · updates after accepted and duplicate test claims</p>
+      <div class="ticker" aria-live="polite"><span>Valid test claims <b id="metric-valid">—</b></span><span>Duplicate tests stopped <b id="metric-duplicates">—</b></span><span>Private fields published <b id="metric-private">0</b></span><span>Test supplies remaining <b id="metric-remaining">—</b></span></div><p class="metrics-note"><span class="status-dot live"></span>Live demo ledger · updates after accepted and duplicate test claims</p>
       <div class="stories-grid">
         <article class="lead-story reveal"><div class="story-image"><div class="fingerprint">◎</div></div><p class="eyebrow">Field report</p><h3>Why aid should never require a permanent public profile</h3><p>Human dignity and transparent impact are not opposing goals. Alethia’s dual-state design lets programs verify the truth without collecting another vulnerable-data archive.</p><a class="pill pill-small" href="#how">Read the field note</a></article>
         <article class="side-story reveal"><div class="story-sketch sketch-audit">✓</div><p class="eyebrow">Protocol note</p><h3>Inside a privacy-safe audit</h3><p>See how selective disclosure gives an auditor one necessary fact—and nothing else.</p></article>
-        <article class="side-story reveal"><div class="story-sketch sketch-midnight">◒</div><p class="eyebrow">Midnight guide</p><h3>Public trust, private state</h3><p>A plain-language look at Compact contracts, shielded data, and verifiable outcomes.</p></article>
+        <article class="side-story reveal"><div class="story-sketch sketch-midnight">◒</div><p class="eyebrow">Midnight roadmap</p><h3>Public trust, private state</h3><p>How this signed prototype maps to a future Compact contract with shielded data and verifiable outcomes.</p></article>
       </div>
     </section>
 
@@ -188,9 +191,9 @@
         <div class="eligibility-copy reveal">
           <p class="eyebrow">Working claim lab</p>
           <h2>Make one private,<br>verifiable claim.</h2>
-          <p>Your answers stay on this device. Alethia sends only an eligibility commitment, a program-specific duplicate guard, and a wallet-derived public reference.</p>
-          <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Test mode</strong></div><small id="network-detail">Browser proofs + Alethia signed ledger</small></div>
-          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>The deployed flow uses an Alethia test wallet unless a compatible Midnight provider is available.</p></div>
+          <p>Your answers stay on this device. Alethia sends only an outcome commitment and a program-specific duplicate guard&mdash;never a reusable wallet identifier.</p>
+          <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Signed prototype</strong></div><small id="network-detail">Local privacy attestation + Alethia receipt ledger</small></div>
+          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>This is a signed privacy prototype, not yet an on-chain Compact zero-knowledge proof. A compatible Midnight wallet can supply local wallet material without publishing its address.</p></div>
         </div>
         <form class="proof-form reveal" id="proof-form">
           <div class="claim-progress" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></div>
@@ -217,7 +220,7 @@
           <div class="form-step" data-step="4">
             <span class="step-count">04 / 04 · REVIEW</span>
             <label>Generate and submit the minimum proof?</label>
-            <div class="disclosure-preview"><span>Shared</span><b>eligible · unique · commitment</b><span>Hidden</span><b>answers · identity · wallet secret</b></div>
+            <div class="disclosure-preview"><span>Shared</span><b>eligible · unique · commitment</b><span>Hidden</span><b>answers · identity · wallet address · wallet secret</b></div>
             <button class="pill generate-proof" type="button">Generate &amp; submit claim</button>
             <p class="inline-status" id="claim-status" aria-live="polite"></p>
           </div>
@@ -262,12 +265,12 @@
   </main>
 
   <footer class="site-footer">
-    <div class="footer-brand"><a class="brand" href="#top"><img class="brand-mark" src="assets/aletheia-mark.png" alt="" width="42" height="42"><span><strong>ALETHIA</strong><small>PROOF WITHOUT EXPOSURE</small></span></a><p>Built for privacy-first aid on Midnight.</p></div>
+    <div class="footer-brand"><a class="brand" href="#top"><img class="brand-mark" src="assets/aletheia-mark.png" alt="" width="42" height="42"><span><strong>ALETHIA</strong><small>PROOF WITHOUT EXPOSURE</small></span></a><p>A privacy-first aid prototype designed for a future Midnight Compact deployment.</p></div>
     <div><h3>Explore</h3><a href="#how">How it works</a><a href="#pathways">Pathways</a><a href="#proof-notes">Proof notes</a></div>
     <div><h3>Build</h3><a href="#questions">Program design</a><a href="#eligibility">Proof preview</a><a href="#questions">Auditor access</a></div>
     <div><h3>Principles</h3><a href="#how">Selective disclosure</a><a href="#how">Private state</a><a href="#how">Public trust</a></div>
     <div class="footer-action"><p>Ready to protect the person behind every proof?</p><a class="pill pill-small" href="#questions">Start a conversation</a></div>
-    <div class="footer-bottom"><span>© 2026 Alethia</span><span>Privacy by design · Powered by Midnight</span></div>
+    <div class="footer-bottom"><span>© 2026 Alethia</span><span>Privacy by design · Midnight-ready prototype</span></div>
   </footer>
 
   <div class="modal story-modal" id="story-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>

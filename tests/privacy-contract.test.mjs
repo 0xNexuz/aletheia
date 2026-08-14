@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const client = await readFile(new URL('../script.js', import.meta.url), 'utf8');
+const server = await readFile(new URL('../dist/server/index.js', import.meta.url), 'utf8');
+const bridge = await readFile(new URL('../api/_bridge.js', import.meta.url), 'utf8');
+const page = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+test('no reusable wallet identifier is uploaded', () => { assert.doesNotMatch(client, /walletId/); assert.doesNotMatch(server, /body\.walletId/); assert.match(server, /claim_records/); });
+test('duplicate guard is program scoped', () => { assert.match(client, /aletheia-nullifier-v1:\$\{PROGRAM_ID\}/); assert.match(server, /idx_claim_records_program_nullifier/); });
+test('metrics are calculated', () => { assert.match(server, /attemptedClaims = validClaims \+ duplicateClaimsStopped/); assert.match(server, /validClaims \/ attemptedClaims/); assert.doesNotMatch(server, /protocolSuccess: '100%'/); });
+test('bridge uses server-only bearer authorization', () => { assert.match(bridge, /OAI-Sites-Authorization/); assert.match(bridge, /Bearer \$\{SITES_TOKEN\}/); });
+test('page labels current implementation honestly', () => { assert.match(page, /signed privacy prototype, not yet an on-chain Compact zero-knowledge proof/i); });

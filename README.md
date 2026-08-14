@@ -2,6 +2,10 @@
 
 Alethia is a privacy-first aid eligibility prototype. Claimants answer locally, submit only a randomized outcome commitment and a program-scoped duplicate guard, and receive a signed, verifiable receipt.
 
+**Live demo:** https://alethia-pi.vercel.app
+
+The public demo includes a 60-second interactive product story, a working test claim flow, signed receipt verification, duplicate prevention, live aggregate Proof Notes, and a private program inquiry form.
+
 ## Working features
 
 - Private eligibility answers remain in the browser.

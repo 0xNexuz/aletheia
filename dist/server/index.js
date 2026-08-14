@@ -40,8 +40,7 @@ async function handleStats(env) {
   const claims = await db.prepare(`SELECT COUNT(*) AS total FROM claim_records WHERE status = ?`).bind('accepted').first();
   const duplicates = await db.prepare(`SELECT COUNT(*) AS total FROM claim_events WHERE event_type = ?`).bind('duplicate_blocked').first();
   const validClaims = Number(claims?.total || 0); const duplicateClaimsStopped = Number(duplicates?.total || 0); const attemptedClaims = validClaims + duplicateClaimsStopped;
-  const protocolSuccess = attemptedClaims ? `${((validClaims / attemptedClaims) * 100).toFixed(1)}%` : 'No tests yet';
-  return json({ validClaims, duplicateClaimsStopped, attemptedClaims, privateFieldsPublished: 0, protocolSuccess, updatedAt: new Date().toISOString() });
+  return json({ validClaims, duplicateClaimsStopped, attemptedClaims, privateFieldsPublished: 0, updatedAt: new Date().toISOString() });
 }
 async function handleInquiry(request, env) {
   const body = await request.json().catch(() => null); const clean = (value, max) => typeof value === 'string' ? value.trim().slice(0, max) : '';

@@ -11,7 +11,7 @@ The public demo includes a 60-second interactive product story, a working test c
 - Private eligibility answers remain in the browser.
 - A program-scoped nullifier prevents duplicate claims without uploading a wallet address or reusable identifier.
 - Accepted receipts are signed with ECDSA P-256 and verified against the ledger.
-- Proof Notes reports accepted and duplicate test activity with a calculated success rate.
+- Proof Notes reports accepted claims, blocked duplicates, and total test attempts.
 - Program inquiries are stored privately for the owner; email notification is not configured.
 - A compatible Midnight wallet may provide local wallet material without publishing its address.
 

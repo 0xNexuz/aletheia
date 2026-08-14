@@ -5,14 +5,16 @@ function base64(bytes) { let value = ''; new Uint8Array(bytes).forEach((b) => va
 function fromBase64(value) { return Uint8Array.from(atob(value), (c) => c.charCodeAt(0)); }
 function isHex64(value) { return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value); }
 async function initialize(db) { await db.batch([
-  db.prepare(`CREATE TABLE IF NOT EXISTS claims (id TEXT PRIMARY KEY, program_id TEXT NOT NULL, wallet_id TEXT NOT NULL, nullifier TEXT NOT NULL, commitment TEXT NOT NULL, wallet_kind TEXT NOT NULL, status TEXT NOT NULL, issued_at TEXT NOT NULL, signature TEXT NOT NULL)`),
-  db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS idx_claims_program_nullifier ON claims(program_id, nullifier)`),
   db.prepare(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)`),
   db.prepare(`CREATE TABLE IF NOT EXISTS inquiries (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL, organization TEXT NOT NULL, program TEXT NOT NULL, message TEXT NOT NULL, created_at TEXT NOT NULL)`),
   db.prepare(`CREATE TABLE IF NOT EXISTS claim_events (id TEXT PRIMARY KEY, event_type TEXT NOT NULL, created_at TEXT NOT NULL)`),
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_claim_events_type ON claim_events(event_type)`),
   db.prepare(`CREATE TABLE IF NOT EXISTS claim_records (id TEXT PRIMARY KEY, program_id TEXT NOT NULL, nullifier TEXT NOT NULL, commitment TEXT NOT NULL, wallet_kind TEXT NOT NULL, status TEXT NOT NULL, issued_at TEXT NOT NULL, signature TEXT NOT NULL)`),
-  db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS idx_claim_records_program_nullifier ON claim_records(program_id, nullifier)`)
+  db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS idx_claim_records_program_nullifier ON claim_records(program_id, nullifier)`),
+  db.prepare(`CREATE TABLE IF NOT EXISTS program_inventory (program_id TEXT PRIMARY KEY, capacity INTEGER NOT NULL CHECK (capacity >= 0), allocated INTEGER NOT NULL DEFAULT 0 CHECK (allocated >= 0 AND allocated <= capacity))`),
+  db.prepare(`INSERT INTO program_inventory (program_id, capacity, allocated) SELECT 'emergency-relief-2026', 1000, COUNT(*) FROM claim_records WHERE program_id = 'emergency-relief-2026' ON CONFLICT(program_id) DO NOTHING`),
+  db.prepare(`CREATE TRIGGER IF NOT EXISTS trg_claim_records_capacity_guard BEFORE INSERT ON claim_records FOR EACH ROW WHEN COALESCE((SELECT allocated >= capacity FROM program_inventory WHERE program_id = NEW.program_id), 1) BEGIN SELECT RAISE(ABORT, 'PROGRAM_CAPACITY_REACHED'); END`),
+  db.prepare(`CREATE TRIGGER IF NOT EXISTS trg_claim_records_allocate AFTER INSERT ON claim_records FOR EACH ROW BEGIN UPDATE program_inventory SET allocated = allocated + 1 WHERE program_id = NEW.program_id; END`)
 ]); }
 async function signingKeys(db) {
   const existing = await db.prepare(`SELECT value FROM settings WHERE key = ?`).bind('receipt_signing_key_v1').first(); let stored = existing?.value;
@@ -27,7 +29,7 @@ async function handleClaimPost(request, env) {
   const receipt = { id: crypto.randomUUID(), programId: body.programId, commitment: body.commitment, status: 'accepted', issuedAt: new Date().toISOString(), issuer: 'Alethia Claim Ledger v1', proofMode: body.walletKind === 'midnight-preprod' ? 'midnight-wallet-connected' : 'browser-test' };
   const signature = base64(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, keys.privateKey, encoder.encode(JSON.stringify(receipt))));
   try { await db.batch([db.prepare(`INSERT INTO claim_records (id, program_id, nullifier, commitment, wallet_kind, status, issued_at, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).bind(receipt.id, body.programId, body.nullifier, body.commitment, body.walletKind, receipt.status, receipt.issuedAt, signature), db.prepare(`INSERT INTO claim_events (id, event_type, created_at) VALUES (?, ?, ?)`).bind(crypto.randomUUID(), 'accepted', receipt.issuedAt)]); return json({ receipt, signature, publicKey: keys.publicJwk }, 201); }
-  catch (error) { if (String(error).toLowerCase().includes('unique')) { await db.prepare(`INSERT INTO claim_events (id, event_type, created_at) VALUES (?, ?, ?)`).bind(crypto.randomUUID(), 'duplicate_blocked', new Date().toISOString()).run(); return json({ error: 'This wallet has already claimed this program benefit.', code: 'DUPLICATE_CLAIM' }, 409); } throw error; }
+  catch (error) { const message = String(error).toLowerCase(); if (message.includes('program_capacity_reached')) return json({ error: 'This program has allocated all available supplies.', code: 'PROGRAM_FULL' }, 409); if (message.includes('unique')) { await db.prepare(`INSERT INTO claim_events (id, event_type, created_at) VALUES (?, ?, ?)`).bind(crypto.randomUUID(), 'duplicate_blocked', new Date().toISOString()).run(); return json({ error: 'This wallet has already claimed this program benefit.', code: 'DUPLICATE_CLAIM' }, 409); } throw error; }
 }
 async function handleClaimGet(url, env) {
   const id = url.searchParams.get('id'); if (!id) return json({ error: 'Receipt id is required.' }, 400); const db = env.DB; await initialize(db);
@@ -39,8 +41,10 @@ async function handleStats(env) {
   const db = env.DB; await initialize(db);
   const claims = await db.prepare(`SELECT COUNT(*) AS total FROM claim_records WHERE status = ?`).bind('accepted').first();
   const duplicates = await db.prepare(`SELECT COUNT(*) AS total FROM claim_events WHERE event_type = ?`).bind('duplicate_blocked').first();
+  const inventory = await db.prepare(`SELECT capacity, allocated FROM program_inventory WHERE program_id = ?`).bind('emergency-relief-2026').first();
   const validClaims = Number(claims?.total || 0); const duplicateClaimsStopped = Number(duplicates?.total || 0); const attemptedClaims = validClaims + duplicateClaimsStopped;
-  return json({ validClaims, duplicateClaimsStopped, attemptedClaims, privateFieldsPublished: 0, updatedAt: new Date().toISOString() });
+  const supplyCapacity = Number(inventory?.capacity || 0); const allocatedSupplies = Number(inventory?.allocated || 0); const remainingSupplies = Math.max(0, supplyCapacity - allocatedSupplies);
+  return json({ validClaims, duplicateClaimsStopped, attemptedClaims, privateFieldsPublished: 0, supplyCapacity, allocatedSupplies, remainingSupplies, updatedAt: new Date().toISOString() });
 }
 async function handleInquiry(request, env) {
   const body = await request.json().catch(() => null); const clean = (value, max) => typeof value === 'string' ? value.trim().slice(0, max) : '';

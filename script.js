@@ -63,11 +63,11 @@ async function loadMetrics() {
     document.querySelector('#metric-valid').textContent = Number(data.validClaims).toLocaleString();
     document.querySelector('#metric-duplicates').textContent = Number(data.duplicateClaimsStopped).toLocaleString();
     document.querySelector('#metric-private').textContent = Number(data.privateFieldsPublished).toLocaleString();
-    document.querySelector('#metric-success').textContent = Number(data.attemptedClaims).toLocaleString();
+    document.querySelector('#metric-remaining').textContent = Number(data.remainingSupplies).toLocaleString();
   } catch {
     document.querySelector('#metric-valid').textContent = '—';
     document.querySelector('#metric-duplicates').textContent = '—';
-    document.querySelector('#metric-success').textContent = '—';
+    document.querySelector('#metric-remaining').textContent = '—';
   }
 }
 loadMetrics();

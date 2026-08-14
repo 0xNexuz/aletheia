@@ -60,21 +60,53 @@ The contact form stores inquiries in the private Sites database for the project 
 
 This is a signed privacy prototype, not a production aid-distribution system. It does not yet issue trusted eligibility credentials, submit a Compact transaction, or generate an on-chain Midnight zero-knowledge proof. Do not use it for real beneficiary decisions without those controls, operational review, and a recovery or appeals process.
 
-## Repository map
+## Architecture map
 
-```text
-api/                 Vercel's narrow server-side bridge to the private backend
-assets/              Logo, favicon, illustrations, and story artwork
-dist/client/         Publish-ready browser assets
-dist/server/         Cloudflare-compatible Sites worker
-drizzle/             Database migrations (source)
-tests/               Privacy and deployment contract tests
-index.html            Main application page
-script.js             Client claim, receipt, metrics, and interaction logic
-styles.css            Responsive visual system
-vercel.json           Public Vercel routing and security headers
+```mermaid
+flowchart LR
+    subgraph Device["Claimant device - private boundary"]
+        Person["Claimant or program lead"]
+        Browser["Alethia browser app<br/>index.html / script.js / styles.css"]
+        Inputs[("Private eligibility answers<br/>kept in browser")]
+        Wallet["Optional Midnight wallet"]
+
+        Person --> Browser
+        Inputs --> Browser
+        Wallet -->|"Local wallet material"| Browser
+    end
+
+    subgraph Public["Public Vercel edge"]
+        UI["Static UI and visual assets"]
+        Bridge["Server-only API bridge<br/>api/ / vercel.json"]
+    end
+
+    subgraph Private["Private Sites backend"]
+        Worker["Claim and inquiry worker<br/>dist/server/index.js"]
+        Ledger[("D1 claim ledger<br/>nullifiers / receipts / inventory")]
+        Keys[("Receipt signing key")]
+        Migrations["Drizzle migrations"]
+    end
+
+    Browser -->|"Load application"| UI
+    Browser -->|"Program ID / scoped nullifier<br/>randomized commitment"| Bridge
+    Bridge -->|"Authenticated server request"| Worker
+    Worker -->|"Atomic duplicate and capacity checks"| Ledger
+    Keys -->|"ECDSA P-256 signature"| Worker
+    Migrations --> Ledger
+    Worker -->|"Signed receipt / aggregate metrics"| Bridge
+    Bridge --> Browser
+
+    Tests["Privacy and deployment contract tests"] -.-> Browser
+    Tests -.-> Bridge
+    Tests -.-> Worker
+
+    classDef private fill:#17343a,color:#fff,stroke:#54c7ba,stroke-width:2px;
+    classDef public fill:#f5dfaa,color:#1d302c,stroke:#1d302c,stroke-width:1px;
+    classDef data fill:#f8efe2,color:#1d302c,stroke:#c98f68,stroke-width:2px;
+    class Browser,Inputs,Wallet private;
+    class UI,Bridge public;
+    class Ledger,Keys data;
 ```
-
 
 ## Run locally
 

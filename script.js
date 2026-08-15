@@ -80,7 +80,7 @@ const deniedResult = document.querySelector('.proof-denied');
 const claimStatus = document.querySelector('#claim-status');
 const walletStatus = document.querySelector('#wallet-status');
 const generateButton = document.querySelector('.generate-proof');
-let claim = { walletKind: null, walletMaterial: null, answers: {}, receipt: null };
+let claim = { walletKind: null, walletMaterial: null, connectedApi: null, answers: {}, receipt: null };
 
 function bytesToHex(bytes) { return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 function bytesToBase64(bytes) { let value = ''; new Uint8Array(bytes).forEach((b) => { value += String.fromCharCode(b); }); return btoa(value); }
@@ -99,7 +99,7 @@ async function connectTestWallet() {
 }
 
 async function connectMidnightWallet() {
-  const wallet = window.midnight?.mnLace;
+  const wallet = window.midnight?.mnLace || Object.values(window.midnight || {}).find((provider) => typeof provider?.connect === 'function');
   if (!wallet?.connect) { walletStatus.textContent = 'Midnight Lace was not detected. Install/enable it, refresh, or use the test wallet.'; return; }
   try {
     walletStatus.textContent = 'Waiting for Midnight wallet approval…';
@@ -108,10 +108,35 @@ async function connectMidnightWallet() {
     const connection = await connectedApi.getConnectionStatus();
     if (!connection || !addresses?.shieldedAddress) throw new Error('Wallet did not return a shielded address.');
     claim.walletKind = 'midnight-preprod'; claim.walletMaterial = addresses.shieldedAddress;
+    claim.connectedApi = connectedApi;
     walletStatus.textContent = `Midnight connected · ${addresses.shieldedAddress.slice(0, 8)}…${addresses.shieldedAddress.slice(-6)}`;
-    setNetwork(true, 'Midnight wallet connected', 'Wallet material stays local · no on-chain proof is submitted yet');
+    setNetwork(true, 'Midnight Preprod connected', 'A real network transaction requires a separate Lace approval');
     setTimeout(() => showProofStep(1), 350);
   } catch (error) { walletStatus.textContent = error?.message || 'Midnight wallet connection was declined.'; }
+}
+
+function historyHashes(entries) { return new Set((Array.isArray(entries) ? entries : entries?.transactions || []).map((entry) => entry?.txHash).filter(Boolean)); }
+async function submitPreprodTransaction() {
+  const api = claim.connectedApi;
+  if (!api?.makeTransfer || !api?.submitTransaction || !api?.getTxHistory) throw new Error('This wallet does not expose the Midnight transaction API. Update Lace and reconnect.');
+  const balances = await api.getShieldedBalances();
+  const spendable = Object.entries(balances || {}).find(([, value]) => BigInt(value) > 0n);
+  if (!spendable) throw new Error('No shielded Preprod token is available. Fund Lace with tNIGHT and generate tDUST first.');
+  const [type] = spendable;
+  const before = historyHashes(await api.getTxHistory(0, 25));
+  claimStatus.textContent = 'Approve the 1-unit Preprod self-transfer in Lace. Testnet fees may apply.';
+  const prepared = await api.makeTransfer([{ kind: 'shielded', recipient: claim.walletMaterial, type, value: 1n }], { payFees: true });
+  if (!prepared?.tx) throw new Error('Lace did not prepare a transaction.');
+  await api.submitTransaction(prepared.tx);
+  claimStatus.textContent = 'Transaction submitted. Waiting for its Preprod hash…';
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const history = await api.getTxHistory(0, 25);
+    const entries = Array.isArray(history) ? history : history?.transactions || [];
+    const newest = entries.find((entry) => entry?.txHash && !before.has(entry.txHash));
+    if (newest) return { txHash: newest.txHash, txStatus: newest.txStatus || 'submitted' };
+  }
+  throw new Error('The wallet submitted the transaction, but its hash has not appeared yet. Wait a moment and retry verification; the reservation expires automatically.');
 }
 
 document.querySelectorAll('.wallet-choice').forEach((button) => button.addEventListener('click', () => button.dataset.wallet === 'midnight' ? connectMidnightWallet() : connectTestWallet()));
@@ -131,12 +156,24 @@ async function createClaim() {
     const nullifier = await sha256(`aletheia-nullifier-v1:${PROGRAM_ID}:${claim.walletMaterial}`);
     const nonce = bytesToBase64(crypto.getRandomValues(new Uint8Array(24)));
     const commitment = await sha256(JSON.stringify({ domain: 'aletheia-claim-v2', programId: PROGRAM_ID, eligible: true, nonce }));
-    const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId: PROGRAM_ID, nullifier, commitment, walletKind: claim.walletKind }) });
-    const data = await response.json();
-    if (!response.ok) throw Object.assign(new Error(data.error || 'Claim could not be recorded.'), { code: data.code });
-    claim.receipt = data;
+    let data = claim.receipt?.receipt?.status === 'reserved' ? claim.receipt : null;
+    if (!data) {
+      const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId: PROGRAM_ID, nullifier, commitment, walletKind: claim.walletKind }) });
+      data = await response.json();
+      if (!response.ok) throw Object.assign(new Error(data.error || 'Claim could not be recorded.'), { code: data.code });
+      claim.receipt = data;
+    }
+    if (claim.walletKind === 'midnight-preprod') {
+      const chain = await submitPreprodTransaction();
+      const finalizeResponse = await fetch('/api/claims', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: data.receipt.id, txHash: chain.txHash, txStatus: chain.txStatus, network: 'preprod' }) });
+      const finalized = await finalizeResponse.json();
+      if (!finalizeResponse.ok) throw new Error(finalized.error || 'The Preprod transaction could not be attached to the receipt.');
+      claim.receipt = finalized;
+    }
     proofSteps.forEach((step) => step.classList.remove('active')); progress.forEach((bar) => bar.classList.add('active'));
-    document.querySelector('#receipt-short').textContent = `${data.receipt.id.slice(0, 8)}…`;
+    document.querySelector('#receipt-short').textContent = `${claim.receipt.receipt.id.slice(0, 8)}…`;
+    const txHash = claim.receipt.receipt.txHash;
+    document.querySelector('#tx-short').textContent = txHash ? `Preprod ${txHash.slice(0, 8)}…` : 'signed ledger';
     acceptedResult.classList.add('active');
     loadMetrics();
   } catch (error) {

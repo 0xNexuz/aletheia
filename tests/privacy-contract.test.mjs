@@ -10,4 +10,6 @@ test('duplicate guard is program scoped', () => { assert.match(client, /aletheia
 test('metrics report explicit attempt and inventory totals', () => { assert.match(server, /attemptedClaims = validClaims \+ duplicateClaimsStopped/); assert.match(server, /remainingSupplies/); assert.doesNotMatch(server, /protocolSuccess/); });
 test('inventory is atomically capped', () => { assert.match(server, /trg_claim_records_capacity_guard/); assert.match(server, /PROGRAM_CAPACITY_REACHED/); assert.match(server, /PROGRAM_FULL/); });
 test('bridge uses server-only bearer authorization', () => { assert.match(bridge, /OAI-Sites-Authorization/); assert.match(bridge, /Bearer \$\{SITES_TOKEN\}/); });
-test('page labels current implementation honestly', () => { assert.match(page, /signed privacy prototype, not yet an on-chain Compact zero-knowledge proof/i); });
+test('page labels current implementation honestly', () => { assert.match(page, /Eligibility remains self-attested until the Compact credential circuit is deployed/i); });
+test('Midnight flow submits a real Preprod transaction and records its hash', () => { assert.match(client, /makeTransfer/); assert.match(client, /submitTransaction/); assert.match(client, /getTxHistory/); assert.match(server, /onchain_submitted/); assert.match(server, /tx_hash/); });
+test('unfinished reservations expire and release inventory', () => { assert.match(server, /reserved_until/); assert.match(server, /status = 'expired'/); assert.match(server, /trg_claim_records_release_v2/); });

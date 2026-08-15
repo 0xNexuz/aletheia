@@ -193,7 +193,7 @@
           <h2>Make one private,<br>verifiable claim.</h2>
           <p>Your answers stay on this device. Alethia sends only an outcome commitment and a program-specific duplicate guard&mdash;never a reusable wallet identifier.</p>
           <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Signed prototype</strong></div><small id="network-detail">Local privacy attestation + Alethia receipt ledger</small></div>
-          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>This is a signed privacy prototype, not yet an on-chain Compact zero-knowledge proof. A compatible Midnight wallet can supply local wallet material without publishing its address.</p></div>
+          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>Lace users can approve a real Midnight Preprod transaction and attach its hash to the signed claim receipt. Eligibility remains self-attested until the Compact credential circuit is deployed.</p></div>
         </div>
         <form class="proof-form reveal" id="proof-form">
           <div class="claim-progress" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></div>
@@ -202,7 +202,7 @@
             <label>Choose how to protect this claim.</label>
             <p class="step-help">A wallet creates a private secret on your device. It stops a second claim without publishing your identity.</p>
             <div class="wallet-options">
-              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Connect Midnight wallet</b><small>Uses an injected compatible provider when available</small></button>
+              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Connect Midnight Preprod</b><small>Approves a real 1-unit self-transfer after eligibility succeeds</small></button>
               <button class="wallet-choice recommended" type="button" data-wallet="test"><b>Use Alethia test wallet</b><small>Creates a local, non-chain identity for this live demo</small></button>
             </div>
             <p class="inline-status" id="wallet-status" aria-live="polite"></p>
@@ -226,7 +226,7 @@
           </div>
           <div class="proof-result" aria-live="polite">
             <div class="proof-ring">✓</div><p class="eyebrow">Signed receipt issued</p><h3>Claim accepted</h3>
-            <ul><li>Eligibility <b>confirmed</b></li><li>Duplicate check <b>passed</b></li><li>Private fields stored <b>zero</b></li><li>Receipt <b id="receipt-short">—</b></li></ul>
+            <ul><li>Eligibility <b>confirmed</b></li><li>Duplicate check <b>passed</b></li><li>Private fields stored <b>zero</b></li><li>Network evidence <b id="tx-short">ledger only</b></li><li>Receipt <b id="receipt-short">—</b></li></ul>
             <div class="receipt-actions"><button class="pill pill-small copy-receipt" type="button">Copy receipt</button><button class="pill pill-small pill-outline verify-receipt" type="button">Verify receipt</button></div>
             <p class="verification-status" id="verification-status"></p><button class="text-link restart-proof" type="button">Start another claim ↻</button>
           </div>

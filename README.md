@@ -4,6 +4,15 @@
 
 [Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md)
 
+## Submission snapshot
+
+- **Build:** Aletheia
+- **Website:** https://alethia-pi.vercel.app
+- **Audience:** humanitarian field teams, program leaders, auditors, and privacy infrastructure judges
+- **Feature to emphasize:** issuer-signed private eligibility plus program-scoped duplicate prevention and inventory caps
+- **Viewer action:** try the claim lab, retry a program to see duplicate rejection, then send a private program-design inquiry
+- **Preview format:** 60-second judge walkthrough in [DEMO.md](DEMO.md)
+
 Aletheia proves that a claimant satisfies an aid policy, has not claimed that program before, and can still receive available inventory. Midnight Compact keeps age, income, household, jurisdiction, credential ID, and wallet secret private; the operational backend handles stock, reservations, reconciliation, aggregate Proof Notes, inquiries, and signed receipts.
 
 Midnight is necessary because a normal database prevents duplicates by learning or assigning a reusable identity. Aletheia’s Compact contract instead verifies an issuer-signed private credential and publishes a program-scoped nullifier: stable inside one program, intentionally different across other programs.

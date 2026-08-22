@@ -6,6 +6,7 @@
   "workspaces": ["contract"],
   "scripts": {
     "compact": "npm run compact -w contract",
+    "prebuild": "node scripts/ensure-compact.mjs",
     "build:contract": "npm run build -w contract",
     "prepare:contract-assets": "node scripts/prepare-contract-assets.mjs",
     "build:client": "npm run prepare:contract-assets && vite build",

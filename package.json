@@ -1,10 +1,48 @@
 {
   "name": "aletheia",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
+  "workspaces": ["contract"],
   "scripts": {
-    "build": "node build.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "compact": "npm run compact -w contract",
+    "prebuild": "node scripts/ensure-compact.mjs",
+    "build:contract": "npm run build -w contract",
+    "prepare:contract-assets": "node scripts/prepare-contract-assets.mjs",
+    "build:client": "npm run prepare:contract-assets && vite build",
+    "build": "npm run build:contract && npm run build:client",
+    "test:contract": "npm test -w contract",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "npm run typecheck -w contract && tsc --noEmit",
+    "lint": "eslint script.js src api lib tests scripts --max-warnings=0"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-js": "2.5.1",
+    "@midnight-ntwrk/dapp-connector-api": "4.0.1",
+    "@midnight-ntwrk/midnight-js-contracts": "4.1.1",
+    "@midnight-ntwrk/midnight-js-fetch-zk-config-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-network-id": "4.1.1",
+    "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
+    "@midnight-ntwrk/midnight-js-types": "4.1.1",
+    "@midnight-ntwrk/midnight-js-utils": "4.1.1",
+    "effect": "^3.14.0",
+    "fp-ts": "^2.16.11",
+    "graphql": "^16.11.0",
+    "pino": "^10.3.1",
+    "rxjs": "^7.8.2",
+    "semver": "^7.7.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^25.0.1",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-wasm": "^3.5.0"
+  },
+  "overrides": {
+    "smoldot": "npm:empty-npm-package@1.0.0"
   }
 }

@@ -1,3 +1,5 @@
+import { connectCompact, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
+
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 menuButton?.addEventListener('click', () => { const open = nav.classList.toggle('open'); menuButton.setAttribute('aria-expanded', String(open)); menuButton.textContent = open ? 'Close' : 'Menu'; });
@@ -72,7 +74,7 @@ async function loadMetrics() {
 }
 loadMetrics();
 const encoder = new TextEncoder();
-const PROGRAM_ID = 'emergency-relief-2026';
+const programSelect = document.querySelector('#program-select');
 const proofSteps = [...document.querySelectorAll('.form-step')];
 const progress = [...document.querySelectorAll('.claim-progress i')];
 const acceptedResult = document.querySelector('.proof-result:not(.proof-denied)');
@@ -80,7 +82,7 @@ const deniedResult = document.querySelector('.proof-denied');
 const claimStatus = document.querySelector('#claim-status');
 const walletStatus = document.querySelector('#wallet-status');
 const generateButton = document.querySelector('.generate-proof');
-let claim = { walletKind: null, walletMaterial: null, connectedApi: null, answers: {}, receipt: null };
+let claim = { walletKind: null, walletMaterial: null, answers: {}, receipt: null, nullifier: null };
 
 function bytesToHex(bytes) { return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 function bytesToBase64(bytes) { let value = ''; new Uint8Array(bytes).forEach((b) => { value += String.fromCharCode(b); }); return btoa(value); }
@@ -89,54 +91,24 @@ function showProofStep(index) { proofSteps.forEach((step, i) => step.classList.t
 function setNetwork(live, label, detail) { document.querySelector('#network-dot').classList.toggle('live', live); document.querySelector('#network-label').textContent = label; document.querySelector('#network-detail').textContent = detail; }
 
 async function connectTestWallet() {
-  let secret = localStorage.getItem('aletheia_test_wallet_v1');
-  if (!secret) { const random = crypto.getRandomValues(new Uint8Array(32)); secret = bytesToBase64(random); localStorage.setItem('aletheia_test_wallet_v1', secret); }
+  let secret = sessionStorage.getItem('aletheia_simulation_secret_v1');
+  if (!secret) { const random = crypto.getRandomValues(new Uint8Array(32)); secret = bytesToBase64(random); sessionStorage.setItem('aletheia_simulation_secret_v1', secret); }
   claim.walletKind = 'aletheia-test'; claim.walletMaterial = secret;
   const id = await sha256(secret);
-  walletStatus.textContent = `Test wallet ready · ${id.slice(0, 8)}…${id.slice(-6)}`;
-  setNetwork(false, 'Signed prototype', 'Local attestation + signed Alethia receipt ledger');
+  walletStatus.textContent = `Simulation secret ready · ${id.slice(0, 8)}…${id.slice(-6)}`;
+  setNetwork(false, 'Simulation mode', 'No blockchain transaction or zero-knowledge proof is claimed');
   setTimeout(() => showProofStep(1), 350);
 }
 
 async function connectMidnightWallet() {
-  const wallet = window.midnight?.mnLace || Object.values(window.midnight || {}).find((provider) => typeof provider?.connect === 'function');
-  if (!wallet?.connect) { walletStatus.textContent = 'Midnight Lace was not detected. Install/enable it, refresh, or use the test wallet.'; return; }
   try {
     walletStatus.textContent = 'Waiting for Midnight wallet approval…';
-    const connectedApi = await wallet.connect('preprod');
-    const addresses = await connectedApi.getShieldedAddresses();
-    const connection = await connectedApi.getConnectionStatus();
-    if (!connection || !addresses?.shieldedAddress) throw new Error('Wallet did not return a shielded address.');
-    claim.walletKind = 'midnight-preprod'; claim.walletMaterial = addresses.shieldedAddress;
-    claim.connectedApi = connectedApi;
-    walletStatus.textContent = `Midnight connected · ${addresses.shieldedAddress.slice(0, 8)}…${addresses.shieldedAddress.slice(-6)}`;
-    setNetwork(true, 'Midnight Preprod connected', 'A real network transaction requires a separate Lace approval');
+    const connection = await connectCompact();
+    claim.walletKind = 'midnight-compact'; claim.walletMaterial = connection.contractAddress;
+    walletStatus.textContent = `Compact contract joined · ${connection.contractAddress.slice(0, 10)}…`;
+    setNetwork(true, 'Midnight Compact · Preprod', 'Real proof generation and contract call; Lace approval required');
     setTimeout(() => showProofStep(1), 350);
   } catch (error) { walletStatus.textContent = error?.message || 'Midnight wallet connection was declined.'; }
-}
-
-function historyHashes(entries) { return new Set((Array.isArray(entries) ? entries : entries?.transactions || []).map((entry) => entry?.txHash).filter(Boolean)); }
-async function submitPreprodTransaction() {
-  const api = claim.connectedApi;
-  if (!api?.makeTransfer || !api?.submitTransaction || !api?.getTxHistory) throw new Error('This wallet does not expose the Midnight transaction API. Update Lace and reconnect.');
-  const balances = await api.getShieldedBalances();
-  const spendable = Object.entries(balances || {}).find(([, value]) => BigInt(value) > 0n);
-  if (!spendable) throw new Error('No shielded Preprod token is available. Fund Lace with tNIGHT and generate tDUST first.');
-  const [type] = spendable;
-  const before = historyHashes(await api.getTxHistory(0, 25));
-  claimStatus.textContent = 'Approve the 1-unit Preprod self-transfer in Lace. Testnet fees may apply.';
-  const prepared = await api.makeTransfer([{ kind: 'shielded', recipient: claim.walletMaterial, type, value: 1n }], { payFees: true });
-  if (!prepared?.tx) throw new Error('Lace did not prepare a transaction.');
-  await api.submitTransaction(prepared.tx);
-  claimStatus.textContent = 'Transaction submitted. Waiting for its Preprod hash…';
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    const history = await api.getTxHistory(0, 25);
-    const entries = Array.isArray(history) ? history : history?.transactions || [];
-    const newest = entries.find((entry) => entry?.txHash && !before.has(entry.txHash));
-    if (newest) return { txHash: newest.txHash, txStatus: newest.txStatus || 'submitted' };
-  }
-  throw new Error('The wallet submitted the transaction, but its hash has not appeared yet. Wait a moment and retry verification; the reservation expires automatically.');
 }
 
 document.querySelectorAll('.wallet-choice').forEach((button) => button.addEventListener('click', () => button.dataset.wallet === 'midnight' ? connectMidnightWallet() : connectTestWallet()));
@@ -153,19 +125,24 @@ async function createClaim() {
   if (!eligible) { proofSteps.forEach((step) => step.classList.remove('active')); deniedResult.classList.add('active'); return; }
   generateButton.disabled = true; claimStatus.textContent = 'Creating commitment and checking uniqueness…';
   try {
-    const nullifier = await sha256(`aletheia-nullifier-v1:${PROGRAM_ID}:${claim.walletMaterial}`);
+    const programId = programSelect.value; let preparedCompact;
+    const nullifier = claim.walletKind === 'midnight-compact'
+      ? (preparedCompact = await prepareCompactClaim(programId, (state) => { claimStatus.textContent = state; })).nullifier
+      : await sha256(`aletheia-simulation-nullifier-v1:${programId}:${claim.walletMaterial}`);
+    claim.nullifier = nullifier;
     const nonce = bytesToBase64(crypto.getRandomValues(new Uint8Array(24)));
-    const commitment = await sha256(JSON.stringify({ domain: 'aletheia-claim-v2', programId: PROGRAM_ID, eligible: true, nonce }));
+    const commitment = await sha256(JSON.stringify({ domain: 'aletheia-claim-v3', programId, eligible: true, nonce }));
     let data = claim.receipt?.receipt?.status === 'reserved' ? claim.receipt : null;
     if (!data) {
-      const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId: PROGRAM_ID, nullifier, commitment, walletKind: claim.walletKind }) });
+      const response = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ programId, nullifier, commitment, proofMode: claim.walletKind === 'midnight-compact' ? 'midnight-compact' : 'simulation' }) });
       data = await response.json();
       if (!response.ok) throw Object.assign(new Error(data.error || 'Claim could not be recorded.'), { code: data.code });
       claim.receipt = data;
     }
-    if (claim.walletKind === 'midnight-preprod') {
-      const chain = await submitPreprodTransaction();
-      const finalizeResponse = await fetch('/api/claims', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: data.receipt.id, txHash: chain.txHash, txStatus: chain.txStatus, network: 'preprod' }) });
+    if (claim.walletKind === 'midnight-compact') {
+      const chain = await submitPreparedCompactClaim(preparedCompact, (state) => { claimStatus.textContent = state; });
+      claimStatus.textContent = 'Verifying nullifier and finalizing inventory…';
+      const finalizeResponse = await fetch('/api/claims', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: data.receipt.id, txHash: chain.txHash, network: 'preprod', contractAddress: chain.contractAddress, blockReference: chain.blockReference }) });
       const finalized = await finalizeResponse.json();
       if (!finalizeResponse.ok) throw new Error(finalized.error || 'The Preprod transaction could not be attached to the receipt.');
       claim.receipt = finalized;
@@ -173,12 +150,18 @@ async function createClaim() {
     proofSteps.forEach((step) => step.classList.remove('active')); progress.forEach((bar) => bar.classList.add('active'));
     document.querySelector('#receipt-short').textContent = `${claim.receipt.receipt.id.slice(0, 8)}…`;
     const txHash = claim.receipt.receipt.txHash;
-    document.querySelector('#tx-short').textContent = txHash ? `Preprod ${txHash.slice(0, 8)}…` : 'signed ledger';
+    const compact = claim.receipt.receipt.proofMode === 'midnight-compact';
+    document.querySelector('#result-mode').textContent = compact ? 'Compact transaction submitted' : 'Signed simulation receipt';
+    document.querySelector('#result-proof').textContent = compact ? 'valid' : 'simulated';
+    document.querySelector('#tx-short').textContent = txHash ? `Preprod ${txHash.slice(0, 8)}…` : 'not applicable';
+    document.querySelector('#evidence-program').textContent = programId; document.querySelector('#evidence-mode').textContent = claim.receipt.receipt.proofMode;
+    document.querySelector('#evidence-nullifier').textContent = nullifier; document.querySelector('#evidence-tx').textContent = txHash || 'none — simulation';
+    document.querySelector('#evidence-block').textContent = claim.receipt.receipt.blockReference || 'none — simulation';
     acceptedResult.classList.add('active');
     loadMetrics();
   } catch (error) {
-    claimStatus.textContent = error.code === 'DUPLICATE_CLAIM' ? 'This wallet has already claimed this program benefit. No second receipt was issued.' : error.message;
-    if (error.code === 'DUPLICATE_CLAIM') loadMetrics();
+    claimStatus.textContent = error.code === 'DUPLICATE_CLAIM' ? 'Program nullifier already used. Duplicate allocation attempt rejected.' : error.message;
+    if (error.code === 'DUPLICATE_CLAIM') { proofSteps.forEach((step) => step.classList.remove('active')); document.querySelector('#denied-label').textContent = 'Valid eligibility · no private data revealed'; document.querySelector('#denied-title').textContent = 'Claim rejected'; document.querySelector('#denied-reason').textContent = 'Program nullifier already used. Reason: duplicate allocation attempt.'; deniedResult.classList.add('active'); loadMetrics(); }
   } finally { generateButton.disabled = false; }
 }
 generateButton?.addEventListener('click', createClaim);

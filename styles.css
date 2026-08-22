@@ -299,6 +299,7 @@ em { font-family: var(--text-serif); font-weight: 400; }
 .claim-progress i.active { background: var(--teal); }
 .step-help { max-width: 520px; margin: -25px 0 22px; color: var(--muted); font-family: var(--text-serif); font-size: 11px; }
 .wallet-options { display: grid; gap: 9px; }
+#program-select { width: 100%; margin: 0 0 12px; padding: 13px 12px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 600 10px var(--sans); }
 .wallet-choice { position: relative; padding: 17px 18px; border: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; }
 .wallet-choice:hover { border-color: var(--teal-dark); background: rgba(55,183,162,.06); }
 .wallet-choice b,.wallet-choice small { display: block; }
@@ -311,6 +312,10 @@ em { font-family: var(--text-serif); font-weight: 400; }
 .proof-denied > p:not(.eyebrow) { max-width: 390px; margin: 0 auto 22px; font-family: var(--text-serif); font-size: 11px; }
 .receipt-actions { display: flex; justify-content: center; gap: 8px; }
 .verification-status { min-height: 18px; margin: 13px 0 5px; color: var(--teal-dark); font-size: 10px; }
+.evidence-panel { margin: 18px auto 8px; max-width: 480px; border-top: 1px solid var(--line); text-align: left; font-size: 9px; }
+.evidence-panel summary { padding: 12px 0; cursor: pointer; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.evidence-panel dl { display: grid; grid-template-columns: 110px 1fr; gap: 7px 12px; margin: 0; padding: 0 0 12px; overflow-wrap: anywhere; }
+.evidence-panel dt { color: var(--muted); }.evidence-panel dd { margin: 0; }
 .pill:disabled { cursor: wait; opacity: .55; transform: none; }
 @media (max-width: 640px) { .receipt-actions { flex-direction: column; }.receipt-actions .pill { width: 100%; }.wallet-choice.recommended::after { display: none; } }
 /* Alethia identity, live notes, and story preview */

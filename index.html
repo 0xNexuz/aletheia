@@ -191,19 +191,20 @@
         <div class="eligibility-copy reveal">
           <p class="eyebrow">Working claim lab</p>
           <h2>Make one private,<br>verifiable claim.</h2>
-          <p>Your answers stay on this device. Alethia sends only an outcome commitment and a program-specific duplicate guard&mdash;never a reusable wallet identifier.</p>
-          <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Signed prototype</strong></div><small id="network-detail">Local privacy attestation + Alethia receipt ledger</small></div>
-          <div class="privacy-note"><span>◉</span><p><strong>Private inputs are never uploaded.</strong><br>Lace users can approve a real Midnight Preprod transaction and attach its hash to the signed claim receipt. Eligibility remains self-attested until the Compact credential circuit is deployed.</p></div>
+          <p>Your answers stay on this device. Alethia reveals only an eligibility result and a program-scoped nullifier&mdash;never a reusable public identity.</p>
+          <div class="network-card"><div><span class="status-dot" id="network-dot"></span><strong id="network-label">Choose a proof mode</strong></div><small id="network-detail">Simulation is labeled; Compact only succeeds with a deployed Preprod contract.</small></div>
+          <div class="privacy-note"><span>◉</span><p><strong>One credential, unlinkable program claims.</strong><br>Food, medical, and shelter claims derive different nullifiers. Raw age, income, household, jurisdiction, credential ID, and wallet secret remain private.</p></div>
         </div>
         <form class="proof-form reveal" id="proof-form">
           <div class="claim-progress" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></div>
           <div class="form-step active" data-step="1">
             <span class="step-count">01 / 04 · CONNECT</span>
-            <label>Choose how to protect this claim.</label>
+            <label>Choose a program and proof mode.</label>
             <p class="step-help">A wallet creates a private secret on your device. It stops a second claim without publishing your identity.</p>
+            <select id="program-select" aria-label="Aid program"><option value="food-support-2026">Emergency Food Support</option><option value="medical-assistance-2026">Medical Assistance</option><option value="temporary-shelter-2026">Temporary Shelter</option></select>
             <div class="wallet-options">
-              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Connect Midnight Preprod</b><small>Approves a real 1-unit self-transfer after eligibility succeeds</small></button>
-              <button class="wallet-choice recommended" type="button" data-wallet="test"><b>Use Alethia test wallet</b><small>Creates a local, non-chain identity for this live demo</small></button>
+              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Midnight Compact · Preprod</b><small>Generates a zero-knowledge proof and requests Lace approval for the contract call</small></button>
+              <button class="wallet-choice recommended" type="button" data-wallet="test"><b>Clearly labeled simulation</b><small>Demonstrates duplicate and inventory behavior without claiming on-chain proof</small></button>
             </div>
             <p class="inline-status" id="wallet-status" aria-live="polite"></p>
           </div>
@@ -220,18 +221,19 @@
           <div class="form-step" data-step="4">
             <span class="step-count">04 / 04 · REVIEW</span>
             <label>Generate and submit the minimum proof?</label>
-            <div class="disclosure-preview"><span>Shared</span><b>eligible · unique · commitment</b><span>Hidden</span><b>answers · identity · wallet address · wallet secret</b></div>
+            <div class="disclosure-preview"><span>Public</span><b>eligible · program ID · program nullifier · transaction reference</b><span>Private</span><b>age · jurisdiction · household · income · credential ID · wallet secret</b></div>
             <button class="pill generate-proof" type="button">Generate &amp; submit claim</button>
             <p class="inline-status" id="claim-status" aria-live="polite"></p>
           </div>
           <div class="proof-result" aria-live="polite">
-            <div class="proof-ring">✓</div><p class="eyebrow">Signed receipt issued</p><h3>Claim accepted</h3>
-            <ul><li>Eligibility <b>confirmed</b></li><li>Duplicate check <b>passed</b></li><li>Private fields stored <b>zero</b></li><li>Network evidence <b id="tx-short">ledger only</b></li><li>Receipt <b id="receipt-short">—</b></li></ul>
+            <div class="proof-ring">✓</div><p class="eyebrow" id="result-mode">Signed simulation receipt</p><h3>Claim approved</h3>
+            <ul><li>Eligibility proof <b id="result-proof">simulated</b></li><li>Previous claim <b>none</b></li><li>Private data revealed <b>none</b></li><li>Inventory <b>reserved</b></li><li>Midnight evidence <b id="tx-short">not applicable</b></li><li>Receipt <b id="receipt-short">—</b></li></ul>
+            <details class="evidence-panel"><summary>Technical evidence</summary><dl><dt>Program ID</dt><dd id="evidence-program">—</dd><dt>Proof mode</dt><dd id="evidence-mode">—</dd><dt>Nullifier</dt><dd id="evidence-nullifier">—</dd><dt>Network</dt><dd>Midnight Preprod</dd><dt>Transaction</dt><dd id="evidence-tx">—</dd><dt>Block</dt><dd id="evidence-block">—</dd><dt>Public fields</dt><dd>eligible, program ID, scoped nullifier</dd><dt>Private fields sent</dt><dd>none</dd></dl></details>
             <div class="receipt-actions"><button class="pill pill-small copy-receipt" type="button">Copy receipt</button><button class="pill pill-small pill-outline verify-receipt" type="button">Verify receipt</button></div>
             <p class="verification-status" id="verification-status"></p><button class="text-link restart-proof" type="button">Start another claim ↻</button>
           </div>
           <div class="proof-result proof-denied" aria-live="polite">
-            <div class="proof-ring">!</div><p class="eyebrow">No claim submitted</p><h3>Not eligible yet</h3><p>Your private answers stayed on this device. No receipt or duplicate marker was created.</p><button class="text-link restart-proof" type="button">Review answers ↻</button>
+            <div class="proof-ring">!</div><p class="eyebrow" id="denied-label">No claim submitted</p><h3 id="denied-title">Claim rejected</h3><p id="denied-reason">Your private answers stayed on this device. No receipt or duplicate marker was created.</p><button class="text-link restart-proof" type="button">Review or retry ↻</button>
           </div>
         </form>
       </div>
@@ -291,6 +293,6 @@
       <div class="story-controls"><button class="story-play pill pill-small" type="button">Pause</button><button class="story-replay text-link" type="button">Replay</button><span class="story-counter">00:00 / 01:00</span><a class="pill pill-small" href="#eligibility">Try the proof</a></div>
     </div>
   </div>
-  <script src="script.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

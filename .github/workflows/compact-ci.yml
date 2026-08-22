@@ -22,7 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Compile Compact contract
-        run: "$HOME/.compact/bin/compact" compile contract/src/aletheia.compact contract/src/managed/aletheia
+        run: |
+          "$HOME/.compact/bin/compact" compile contract/src/aletheia.compact contract/src/managed/aletheia
       - name: Validate
         run: |
           npm run build

@@ -4,7 +4,7 @@ Alethia is a privacy-first aid allocation prototype. It lets a program verify th
 
 **Live demo:** https://alethia-pi.vercel.app
 
-The demo includes a 60-second interactive story, a test claim flow, signed receipt verification, duplicate prevention, live Proof Notes, and a private program inquiry form.
+The demo includes a 60-second interactive story, a test claim flow, signed receipt verification, duplicate prevention, live Proof Notes, a private program inquiry form, and an optional real Midnight Preprod transaction through Lace.
 
 ## Why Alethia exists
 
@@ -16,8 +16,9 @@ Aid teams need to distribute limited supplies fairly and prove where resources w
 2. The browser creates a randomized outcome commitment and a program-scoped nullifier.
 3. The ledger accepts no more than one claim for the same nullifier and program.
 4. A program inventory guard rejects claims after the configured supply capacity is reached.
-5. An accepted claim receives an ECDSA P-256 signed receipt that can be verified against the ledger.
-6. Proof Notes updates from live aggregate claim, duplicate, and inventory data.
+5. Midnight users receive a 15-minute inventory reservation, approve a 1-unit shielded self-transfer in Lace, and attach the resulting Preprod transaction hash to the claim.
+6. An accepted claim receives an ECDSA P-256 signed receipt that can be verified against the ledger.
+7. Proof Notes updates from live aggregate claim, duplicate, and inventory data.
 
 ## Fair allocation model
 
@@ -28,7 +29,7 @@ Alethia does not need a public list of recipients to prevent repeat collection:
 - **Supply ceiling:** each program has a fixed inventory. A database trigger checks capacity and records allocation atomically, preventing concurrent requests from over-allocating stock.
 - **Accountability:** signed receipts and aggregate totals let operators reconcile issued supplies without exposing recipient records publicly.
 
-The demo enforces program-scoped uniqueness and a 1,000-unit test inventory. Its eligibility questions are self-attested; issuer-backed credentials and an on-chain Compact proof are production milestones.
+The demo enforces program-scoped uniqueness and a 1,000-unit test inventory. Incomplete Preprod reservations expire after 15 minutes and release their allocation. Eligibility is still self-attested: the network transaction is genuine Preprod evidence, but it is not yet a Compact eligibility proof.
 
 ## Feature status
 
@@ -40,6 +41,8 @@ The demo enforces program-scoped uniqueness and a 1,000-unit test inventory. Its
 | Signed, verifiable claim receipts | Working |
 | Live aggregate Proof Notes | Working |
 | Private program inquiry storage | Working |
+| Midnight Preprod transaction submission | Working; requires funded Lace and user approval |
+| Reservation expiry and inventory release | Working |
 | Inquiry email notifications | Not configured |
 | Issuer-backed eligibility credentials | Planned |
 | Midnight Compact zero-knowledge proof | Planned |
@@ -58,7 +61,7 @@ The contact form stores inquiries in the private Sites database for the project 
 
 ## Implementation boundary
 
-This is a signed privacy prototype, not a production aid-distribution system. It does not yet issue trusted eligibility credentials, submit a Compact transaction, or generate an on-chain Midnight zero-knowledge proof. Do not use it for real beneficiary decisions without those controls, operational review, and a recovery or appeals process.
+This is a signed privacy prototype, not a production aid-distribution system. It can submit a real Midnight Preprod self-transfer, but that transaction does not prove eligibility. The build does not yet issue trusted eligibility credentials or generate an on-chain Compact zero-knowledge proof. Do not use it for real beneficiary decisions without those controls, operational review, and a recovery or appeals process.
 
 ## Architecture map
 
@@ -68,7 +71,7 @@ flowchart LR
         Person["Claimant or program lead"]
         Browser["Alethia browser app<br/>index.html / script.js / styles.css"]
         Inputs[("Private eligibility answers<br/>kept in browser")]
-        Wallet["Optional Midnight wallet"]
+        Wallet["Midnight Lace<br/>Preprod transaction approval"]
 
         Person --> Browser
         Inputs --> Browser
@@ -95,6 +98,8 @@ flowchart LR
     Migrations --> Ledger
     Worker -->|"Signed receipt / aggregate metrics"| Bridge
     Bridge --> Browser
+    Browser -->|"1-unit shielded self-transfer"| Wallet
+    Wallet -->|"Preprod transaction hash"| Browser
 
     Tests["Privacy and deployment contract tests"] -.-> Browser
     Tests -.-> Bridge
@@ -122,17 +127,18 @@ npm test
 
 1. Open the live demo and watch the 60-second story.
 2. Select **Check eligibility**.
-3. Use the test wallet or connect a compatible Midnight wallet.
+3. Use the test wallet, or connect a funded Preprod Lace wallet with tNIGHT and tDUST.
 4. Complete the eligibility questions and submit a test claim.
-5. Verify the signed receipt.
-6. Retry with the same wallet to see duplicate prevention.
-7. Confirm Proof Notes updates the accepted, duplicate, private-field, and remaining-supply totals.
+5. For Lace, approve the separate 1-unit self-transfer and wait for its transaction hash.
+6. Verify the signed receipt.
+7. Retry with the same wallet to see duplicate prevention.
+8. Confirm Proof Notes updates the accepted, duplicate, private-field, and remaining-supply totals.
 
 ## Roadmap
 
-- Compact eligibility and nullifier contract with preprod transaction evidence
+- Compact eligibility and nullifier contract (the current Preprod transaction is an anchor, not the eligibility proof)
 - Issuer-backed credentials and selective disclosure
-- Reservation expiry, redemption confirmation, and operator stock reconciliation
+- Redemption confirmation and operator stock reconciliation
 - Offline-safe synchronization and conflict handling
 - Owner inquiry inbox/export and optional notifications
 - Browser end-to-end, concurrency, and contract tests

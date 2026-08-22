@@ -18,12 +18,12 @@ jobs:
       - name: Install Compact
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
-          echo "$HOME/.compact/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: npm ci
       - name: Compile Compact contract
         run: |
-          "$HOME/.compact/bin/compact" compile contract/src/aletheia.compact contract/src/managed/aletheia
+          "$HOME/.local/bin/compact" compile contract/src/aletheia.compact contract/src/managed/aletheia
       - name: Validate
         run: |
           npm run build

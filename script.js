@@ -151,7 +151,7 @@ async function createClaim() {
     document.querySelector('#receipt-short').textContent = `${claim.receipt.receipt.id.slice(0, 8)}…`;
     const txHash = claim.receipt.receipt.txHash;
     const compact = claim.receipt.receipt.proofMode === 'midnight-compact';
-    document.querySelector('#result-mode').textContent = compact ? 'Compact proof verified' : 'Signed simulation receipt';
+    document.querySelector('#result-mode').textContent = compact ? 'Compact transaction submitted' : 'Signed simulation receipt';
     document.querySelector('#result-proof').textContent = compact ? 'valid' : 'simulated';
     document.querySelector('#tx-short').textContent = txHash ? `Preprod ${txHash.slice(0, 8)}…` : 'not applicable';
     document.querySelector('#evidence-program').textContent = programId; document.querySelector('#evidence-mode').textContent = claim.receipt.receipt.proofMode;

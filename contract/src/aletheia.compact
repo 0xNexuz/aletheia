@@ -51,7 +51,7 @@ export pure circuit deriveProgramNullifier(secret: UserSecret, programId: Bytes<
 }
 
 export pure circuit credentialRevocationHandle(credentialId: Bytes<32>, programId: Bytes<32>): Bytes<32> {
-  return persistentHash<[Bytes<30>, Bytes<32>, Bytes<32>]>(["aletheia:credential-revoke:v2", credentialId, programId]);
+  return persistentHash<[Bytes<29>, Bytes<32>, Bytes<32>]>(["aletheia:credential-revoke:v2", credentialId, programId]);
 }
 
 export circuit claim(programId: Bytes<32>): [] {

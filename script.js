@@ -1,4 +1,4 @@
-import { connectCompact, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
+import { connectCompact, discoverCompactWallets, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
 
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
@@ -81,6 +81,8 @@ const acceptedResult = document.querySelector('.proof-result:not(.proof-denied)'
 const deniedResult = document.querySelector('.proof-denied');
 const claimStatus = document.querySelector('#claim-status');
 const walletStatus = document.querySelector('#wallet-status');
+const walletPicker = document.querySelector('#midnight-wallet-picker');
+const walletSelect = document.querySelector('#midnight-wallet-select');
 const generateButton = document.querySelector('.generate-proof');
 let claim = { walletKind: null, walletMaterial: null, answers: {}, receipt: null, nullifier: null };
 
@@ -89,6 +91,15 @@ function bytesToBase64(bytes) { let value = ''; new Uint8Array(bytes).forEach((b
 async function sha256(value) { return bytesToHex(await crypto.subtle.digest('SHA-256', encoder.encode(value))); }
 function showProofStep(index) { proofSteps.forEach((step, i) => step.classList.toggle('active', i === index)); progress.forEach((bar, i) => bar.classList.toggle('active', i <= index)); acceptedResult.classList.remove('active'); deniedResult.classList.remove('active'); }
 function setNetwork(live, label, detail) { document.querySelector('#network-dot').classList.toggle('live', live); document.querySelector('#network-label').textContent = label; document.querySelector('#network-detail').textContent = detail; }
+
+function refreshMidnightWallets() {
+  const wallets = discoverCompactWallets(); const previous = walletSelect.value;
+  walletSelect.replaceChildren();
+  for (const wallet of wallets) { const option = document.createElement('option'); option.value = wallet.id; option.textContent = `${wallet.name} · API ${wallet.apiVersion}`; walletSelect.append(option); }
+  if (wallets.some(({ id }) => id === previous)) walletSelect.value = previous;
+  walletPicker.hidden = wallets.length === 0;
+  return wallets;
+}
 
 async function connectTestWallet() {
   let secret = sessionStorage.getItem('aletheia_simulation_secret_v1');
@@ -102,16 +113,21 @@ async function connectTestWallet() {
 
 async function connectMidnightWallet() {
   try {
+    const wallets = refreshMidnightWallets();
+    if (wallets.length === 0) throw new Error('No compatible Midnight wallet was detected. Enable a Connector API v4 wallet and refresh.');
     walletStatus.textContent = 'Waiting for Midnight wallet approval…';
-    const connection = await connectCompact();
+    const connection = await connectCompact(walletSelect.value);
     claim.walletKind = 'midnight-compact'; claim.walletMaterial = connection.contractAddress;
-    walletStatus.textContent = `Compact contract joined · ${connection.contractAddress.slice(0, 10)}…`;
-    setNetwork(true, 'Midnight Compact · Preprod', 'Real proof generation and contract call; Lace approval required');
+    walletStatus.textContent = `${connection.walletName} connected · contract ${connection.contractAddress.slice(0, 10)}…`;
+    setNetwork(true, 'Midnight Compact · Preprod', `Real proof generation and contract call through ${connection.walletName}`);
     setTimeout(() => showProofStep(1), 350);
   } catch (error) { walletStatus.textContent = error?.message || 'Midnight wallet connection was declined.'; }
 }
 
 document.querySelectorAll('.wallet-choice').forEach((button) => button.addEventListener('click', () => button.dataset.wallet === 'midnight' ? connectMidnightWallet() : connectTestWallet()));
+document.querySelector('#refresh-midnight-wallets').addEventListener('click', refreshMidnightWallets);
+window.addEventListener('focus', refreshMidnightWallets);
+setTimeout(refreshMidnightWallets, 250);
 
 document.querySelectorAll('.choice-grid button').forEach((button) => button.addEventListener('click', () => {
   const currentStep = Number(button.closest('.form-step').dataset.step);

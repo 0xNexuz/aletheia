@@ -5,3 +5,8 @@ contract/dist/
 public/keys/
 public/zkir/
 .eslintcache
+.midnight/
+evidence/private/
+evidence/*.working.json
+midnight-local-dev/
+*.wallet-keystore.json

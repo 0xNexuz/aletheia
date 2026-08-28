@@ -50,8 +50,8 @@ export pure circuit deriveProgramNullifier(secret: UserSecret, programId: Bytes<
   return persistentHash<[Bytes<21>, UserSecret, Bytes<32>]>(["aletheia:nullifier:v1", secret, programId]);
 }
 
-export pure circuit credentialCommitment(credentialId: Bytes<32>): Bytes<32> {
-  return persistentHash<[Bytes<22>, Bytes<32>]>(["aletheia:credential:v1", credentialId]);
+export pure circuit credentialRevocationHandle(credentialId: Bytes<32>, programId: Bytes<32>): Bytes<32> {
+  return persistentHash<[Bytes<30>, Bytes<32>, Bytes<32>]>(["aletheia:credential-revoke:v2", credentialId, programId]);
 }
 
 export circuit claim(programId: Bytes<32>): [] {
@@ -77,7 +77,7 @@ export circuit claim(programId: Bytes<32>): [] {
   ];
   Schnorr_schnorrVerify<6>(message, signature, providers.lookup(publicProviderId));
 
-  const revocationHandle = disclose(credentialCommitment(credential.credentialId));
+  const revocationHandle = disclose(credentialRevocationHandle(credential.credentialId, programId));
   assert(!revokedCredentials.member(revocationHandle), "Credential is revoked");
   assert(credential.age >= policy.minAge, "Age requirement not satisfied");
   assert(credential.jurisdiction == policy.jurisdiction, "Jurisdiction requirement not satisfied");
@@ -100,9 +100,10 @@ export circuit registerProvider(providerId: Uint<16>, providerPk: JubjubPoint): 
   providers.insert(disclose(providerId), disclose(providerPk));
 }
 
-export circuit revokeCredential(revocationHandle: Bytes<32>): [] {
+export circuit revokeCredential(programId: Bytes<32>, credentialId: Bytes<32>): [] {
   assert(contractAdmin == deriveAdminCommitment(getUserSecret()), "Only admin can revoke credentials");
-  revokedCredentials.insert(disclose(revocationHandle));
+  assert(programs.member(disclose(programId)), "Unknown aid program");
+  revokedCredentials.insert(disclose(credentialRevocationHandle(credentialId, programId)));
 }
 
 export circuit rotateAdmin(nextAdmin: AdminCommitment): [] {

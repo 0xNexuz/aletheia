@@ -1,7 +1,7 @@
 import * as ledger from '@midnight-ntwrk/ledger-v8';
 import { Bytes32Descriptor, transientHash } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
-import { findDeployedContract, submitCallTx } from '@midnight-ntwrk/midnight-js-contracts';
+import { deployContract, findDeployedContract, submitCallTx } from '@midnight-ntwrk/midnight-js-contracts';
 import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
@@ -55,9 +55,7 @@ function privateStateProvider() {
   };
 }
 
-export async function connectCompact(walletId) {
-  const contractAddress = await configuredContractAddress();
-  if (!contractAddress) throw new Error('The Compact contract address is not configured. Simulation remains available, but no on-chain success will be shown.');
+async function connectWallet(walletId) {
   const available = discoverCompactWallets();
   const selected = available.find((item) => item.id === walletId) || (available.length === 1 ? available[0] : null);
   if (!selected) throw new Error(available.length ? 'Choose a compatible Midnight wallet first.' : 'No compatible Midnight wallet was detected. Install or enable a wallet implementing Connector API v4 and refresh.');
@@ -91,9 +89,45 @@ export async function connectCompact(walletId) {
     midnightProvider: { async submitTx(tx) { await wallet.submitTransaction(hex(tx.serialize())); return tx.identifiers()[0]; } }
   };
   const compiledContract = CompiledContract.make('Aletheia', Aletheia.Contract).pipe(CompiledContract.withWitnesses(witnesses), CompiledContract.withCompiledFileAssets(window.location.origin));
+  return { selected, providers, compiledContract, network: status.networkId };
+}
+
+export async function connectCompact(walletId) {
+  const contractAddress = await configuredContractAddress();
+  if (!contractAddress) throw new Error('The Compact contract address is not configured. Simulation remains available, but no on-chain success will be shown.');
+  const { selected, providers, compiledContract, network } = await connectWallet(walletId);
   await findDeployedContract(providers, { contractAddress, compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
   context = { providers, compiledContract, contractAddress };
-  return { contractAddress, network: status.networkId, walletName: selected.name, walletId: selected.id };
+  return { contractAddress, network, walletName: selected.name, walletId: selected.id };
+}
+
+export async function deployCompact(walletId, onState = () => {}) {
+  const existing = await configuredContractAddress();
+  if (existing) throw new Error(`A Preprod contract is already configured at ${existing}.`);
+  const { selected, providers, compiledContract } = await connectWallet(walletId);
+  onState('Approve the Aletheia contract deployment in your wallet');
+  const deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
+  const deployment = deployed.deployTxData.public;
+  const contractAddress = String(deployment.contractAddress);
+  const transactions = [{ action: 'deploy', transactionId: String(deployment.txId), blockReference: String(deployment.blockHeight) }];
+  onState('Registering the signed demo issuer');
+  const issuerResponse = await fetch('/api/credentials', { method: 'GET', cache: 'no-store' });
+  const issuer = await issuerResponse.json();
+  if (!issuerResponse.ok || !issuer?.publicKey) throw new Error(issuer.error || 'The demo issuer configuration is unavailable.');
+  const registered = await deployed.callTx.registerProvider(BigInt(issuer.providerId), { x: BigInt(issuer.publicKey.x), y: BigInt(issuer.publicKey.y) });
+  transactions.push({ action: 'register-provider', transactionId: String(registered.public.txId), blockReference: String(registered.public.blockHeight) });
+  const policies = [
+    ['food-support-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 2500000n, active: true }],
+    ['medical-assistance-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 1n, maxAnnualIncome: 4000000n, active: true }],
+    ['temporary-shelter-2026', { minAge: 21n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 3000000n, active: true }]
+  ];
+  for (const [programId, policy] of policies) {
+    onState(`Configuring ${programId}`);
+    const configured = await deployed.callTx.configureProgram(await programBytes(programId), policy);
+    transactions.push({ action: `configure-${programId}`, transactionId: String(configured.public.txId), blockReference: String(configured.public.blockHeight) });
+  }
+  context = { providers, compiledContract, contractAddress };
+  return { contractAddress, network: 'preprod', walletName: selected.name, transactions };
 }
 
 function emptyState() { return { age: 0n, jurisdiction: 0n, householdSize: 0n, annualIncome: 0n, credentialId: new Uint8Array(32), signature: { announcement: { x: 0n, y: 1n }, response: 0n }, providerId: 0n, userSecret: sessionUserSecret }; }

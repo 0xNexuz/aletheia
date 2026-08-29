@@ -1,0 +1,543 @@
+{
+  "compiler-version": "0.31.1",
+  "language-version": "0.23.0",
+  "runtime-version": "0.16.0",
+  "circuits": [
+    {
+      "name": "deriveAdminCommitment",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "secret",
+          "type": {
+            "type-name": "Alias",
+            "name": "UserSecret",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Alias",
+        "name": "AdminCommitment",
+        "type": {
+          "type-name": "Bytes",
+          "length": 32
+        }
+      }
+    },
+    {
+      "name": "deriveProgramNullifier",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "secret",
+          "type": {
+            "type-name": "Alias",
+            "name": "UserSecret",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          }
+        },
+        {
+          "name": "programId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "credentialRevocationHandle",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "credentialId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "programId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "claim",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "programId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "configureProgram",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "programId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "policy",
+          "type": {
+            "type-name": "Struct",
+            "name": "ProgramPolicy",
+            "elements": [
+              {
+                "name": "minAge",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "jurisdiction",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "minHouseholdSize",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "maxAnnualIncome",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 4294967295
+                }
+              },
+              {
+                "name": "active",
+                "type": {
+                  "type-name": "Boolean"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "registerProvider",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "providerId",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 65535
+          }
+        },
+        {
+          "name": "providerPk",
+          "type": {
+            "type-name": "Alias",
+            "name": "JubjubPoint",
+            "type": {
+              "type-name": "Opaque",
+              "tsType": "JubjubPoint"
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "revokeCredential",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "programId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "credentialId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "rotateAdmin",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "nextAdmin",
+          "type": {
+            "type-name": "Alias",
+            "name": "AdminCommitment",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "schnorrChallenge",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "ann_x",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "ann_y",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "pk_x",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "pk_y",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "msg",
+          "type": {
+            "type-name": "Vector",
+            "length": 6,
+            "type": {
+              "type-name": "Field"
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Field"
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "name": "getSchnorrReduction",
+      "arguments": [
+        {
+          "name": "challengeHash",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result type": {
+        "type-name": "Tuple",
+        "types": [
+          {
+            "type-name": "Uint",
+            "maxval": 127
+          },
+          {
+            "type-name": "Uint",
+            "maxval": 452312848583266388373324160190187140051835877600158453279131187530910662655
+          }
+        ]
+      }
+    },
+    {
+      "name": "getAttestedCredential",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Tuple",
+        "types": [
+          {
+            "type-name": "Struct",
+            "name": "AidCredential",
+            "elements": [
+              {
+                "name": "age",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "jurisdiction",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "householdSize",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 65535
+                }
+              },
+              {
+                "name": "annualIncome",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 4294967295
+                }
+              },
+              {
+                "name": "credentialId",
+                "type": {
+                  "type-name": "Bytes",
+                  "length": 32
+                }
+              }
+            ]
+          },
+          {
+            "type-name": "Struct",
+            "name": "SchnorrSignature",
+            "elements": [
+              {
+                "name": "announcement",
+                "type": {
+                  "type-name": "Alias",
+                  "name": "JubjubPoint",
+                  "type": {
+                    "type-name": "Opaque",
+                    "tsType": "JubjubPoint"
+                  }
+                }
+              },
+              {
+                "name": "response",
+                "type": {
+                  "type-name": "Field"
+                }
+              }
+            ]
+          },
+          {
+            "type-name": "Uint",
+            "maxval": 65535
+          }
+        ]
+      }
+    },
+    {
+      "name": "getUserSecret",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Alias",
+        "name": "UserSecret",
+        "type": {
+          "type-name": "Bytes",
+          "length": 32
+        }
+      }
+    }
+  ],
+  "contracts": [
+  ],
+  "ledger": [
+    {
+      "name": "contractAdmin",
+      "index": 0,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Alias",
+        "name": "AdminCommitment",
+        "type": {
+          "type-name": "Bytes",
+          "length": 32
+        }
+      }
+    },
+    {
+      "name": "providers",
+      "index": 1,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Uint",
+        "maxval": 65535
+      },
+      "value": {
+        "type-name": "Alias",
+        "name": "JubjubPoint",
+        "type": {
+          "type-name": "Opaque",
+          "tsType": "JubjubPoint"
+        }
+      }
+    },
+    {
+      "name": "programs",
+      "index": 2,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Struct",
+        "name": "ProgramPolicy",
+        "elements": [
+          {
+            "name": "minAge",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 65535
+            }
+          },
+          {
+            "name": "jurisdiction",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 65535
+            }
+          },
+          {
+            "name": "minHouseholdSize",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 65535
+            }
+          },
+          {
+            "name": "maxAnnualIncome",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 4294967295
+            }
+          },
+          {
+            "name": "active",
+            "type": {
+              "type-name": "Boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "revokedCredentials",
+      "index": 3,
+      "exported": true,
+      "storage": "Set",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "usedNullifiers",
+      "index": 4,
+      "exported": true,
+      "storage": "Set",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "claims",
+      "index": 5,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Struct",
+        "name": "PublicClaim",
+        "elements": [
+          {
+            "name": "programId",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          },
+          {
+            "name": "eligible",
+            "type": {
+              "type-name": "Boolean"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

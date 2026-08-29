@@ -8,7 +8,7 @@
     "checkJs": false,
     "strict": true,
     "skipLibCheck": true,
-    "types": []
+    "types": ["node"]
   },
-  "include": ["src", "api", "lib"]
+  "include": ["src", "api", "lib", "scripts"]
 }

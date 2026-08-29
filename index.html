@@ -203,8 +203,13 @@
             <p class="step-help">A wallet creates a private secret on your device. It stops a second claim without publishing your identity.</p>
             <select id="program-select" aria-label="Aid program"><option value="food-support-2026">Emergency Food Support</option><option value="medical-assistance-2026">Medical Assistance</option><option value="temporary-shelter-2026">Temporary Shelter</option></select>
             <div class="wallet-options">
-              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Midnight Compact · Preprod</b><small>Generates a zero-knowledge proof and requests Lace approval for the contract call</small></button>
+              <button class="wallet-choice" type="button" data-wallet="midnight"><b>Midnight Compact · Preprod</b><small>Connects through any compatible Midnight Connector API v4 wallet</small></button>
               <button class="wallet-choice recommended" type="button" data-wallet="test"><b>Clearly labeled simulation</b><small>Demonstrates duplicate and inventory behavior without claiming on-chain proof</small></button>
+            </div>
+            <div class="wallet-picker" id="midnight-wallet-picker" hidden>
+              <label for="midnight-wallet-select">Compatible wallet</label>
+              <select id="midnight-wallet-select"></select>
+              <button type="button" id="refresh-midnight-wallets">Refresh</button>
             </div>
             <p class="inline-status" id="wallet-status" aria-live="polite"></p>
           </div>

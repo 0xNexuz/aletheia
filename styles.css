@@ -305,6 +305,12 @@ em { font-family: var(--text-serif); font-weight: 400; }
 .wallet-choice b,.wallet-choice small { display: block; }
 .wallet-choice b { font-size: 12px; }.wallet-choice small { margin-top: 5px; color: var(--muted); font-size: 9px; }
 .wallet-choice.recommended::after { content: "READY"; position: absolute; top: 12px; right: 12px; color: var(--teal-dark); font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+.wallet-picker { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 8px; margin-top: 10px; }
+.wallet-picker[hidden] { display: none; }
+.wallet-picker label { margin: 0; font-family: var(--sans); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.wallet-picker select,.wallet-picker button { min-height: 34px; border: 1px solid var(--line); background: var(--cream); color: var(--ink); font: inherit; font-size: 10px; }
+.wallet-picker select { min-width: 0; padding: 0 9px; }
+.wallet-picker button { padding: 0 12px; cursor: pointer; }
 .inline-status { min-height: 18px; margin: 12px 0 0; color: var(--teal-dark); font-size: 10px; }
 .disclosure-preview { display: grid; grid-template-columns: 75px 1fr; gap: 9px 15px; margin: -15px 0 28px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 10px; }
 .disclosure-preview span { color: var(--muted); }.disclosure-preview b { font-weight: 600; }

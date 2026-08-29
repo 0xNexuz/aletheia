@@ -2,8 +2,11 @@
   "name": "aletheia",
   "version": "0.4.0",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
-  "workspaces": ["contract"],
+  "workspaces": [
+    "contract"
+  ],
   "scripts": {
     "compact": "npm run compact -w contract",
     "prebuild": "node scripts/ensure-compact.mjs",
@@ -11,6 +14,17 @@
     "prepare:contract-assets": "node scripts/prepare-contract-assets.mjs",
     "build:client": "npm run prepare:contract-assets && vite build",
     "build": "npm run build:contract && npm run build:client",
+    "midnight:status:local": "tsx scripts/midnight.ts status local",
+    "midnight:status:preprod": "tsx scripts/midnight.ts status preprod",
+    "midnight:wallet:preprod": "tsx scripts/midnight.ts wallet preprod",
+    "midnight:dust:register:preprod": "tsx scripts/midnight.ts dust-register preprod",
+    "midnight:deploy:local": "tsx scripts/midnight.ts deploy local",
+    "midnight:deploy:preprod": "tsx scripts/midnight.ts deploy preprod",
+    "midnight:claim:local": "tsx scripts/midnight.ts claim local",
+    "midnight:claim:preprod": "tsx scripts/midnight.ts claim preprod",
+    "midnight:test:duplicate": "tsx scripts/midnight.ts duplicate local",
+    "midnight:test:scoped-nullifier": "tsx scripts/midnight.ts scoped-nullifier local",
+    "midnight:e2e:local": "tsx scripts/midnight.ts e2e local",
     "test:contract": "npm test -w contract",
     "test": "node --test tests/*.test.mjs",
     "typecheck": "npm run typecheck -w contract && tsc --noEmit",
@@ -18,31 +32,40 @@
   },
   "dependencies": {
     "@midnight-ntwrk/compact-js": "2.5.1",
+    "@midnight-ntwrk/ledger-v8": "8.1.1",
     "@midnight-ntwrk/dapp-connector-api": "4.0.1",
     "@midnight-ntwrk/midnight-js-contracts": "4.1.1",
     "@midnight-ntwrk/midnight-js-fetch-zk-config-provider": "4.1.1",
     "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.1.1",
     "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-level-private-state-provider": "4.1.1",
     "@midnight-ntwrk/midnight-js-network-id": "4.1.1",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "4.1.1",
     "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
     "@midnight-ntwrk/midnight-js-types": "4.1.1",
     "@midnight-ntwrk/midnight-js-utils": "4.1.1",
+    "@midnight-ntwrk/wallet-sdk-address-format": "3.1.2",
+    "@midnightntwrk/wallet-sdk": "1.2.0",
     "effect": "^3.14.0",
     "fp-ts": "^2.16.11",
     "graphql": "^16.11.0",
     "pino": "^10.3.1",
     "rxjs": "^7.8.2",
-    "semver": "^7.7.4"
+    "semver": "^7.7.4",
+    "ws": "8.21.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^25.0.1",
+    "@types/ws": "^8.18.1",
     "eslint": "^9.39.1",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-wasm": "^3.5.0"
   },
   "overrides": {
+    "@midnight-ntwrk/ledger-v8": "8.1.1",
     "smoldot": "npm:empty-npm-package@1.0.0"
   }
 }

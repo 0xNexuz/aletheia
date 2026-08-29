@@ -10,7 +10,6 @@ import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } f
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
-const CONTRACT_ADDRESS = import.meta.env.VITE_ALETHEIA_CONTRACT_ADDRESS || '';
 let context;
 const sessionUserSecret = crypto.getRandomValues(new Uint8Array(32));
 
@@ -20,6 +19,16 @@ async function programBytes(programId) { return new Uint8Array(await crypto.subt
 function versionParts(value) { return String(value || '').split('.').map((part) => Number.parseInt(part, 10) || 0); }
 function newerVersion(left, right) { const a = versionParts(left); const b = versionParts(right); for (let index = 0; index < 3; index += 1) { if (a[index] !== b[index]) return a[index] > b[index]; } return false; }
 function compatibleConnector(value) { return value && typeof value.connect === 'function' && typeof value.name === 'string' && typeof value.rdns === 'string' && versionParts(value.apiVersion)[0] === 4; }
+async function configuredContractAddress() {
+  const bundled = import.meta.env.VITE_ALETHEIA_CONTRACT_ADDRESS || '';
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    const health = await response.json();
+    const address = health?.midnightNetwork === 'preprod' ? health.contractAddress : '';
+    if (response.ok && typeof address === 'string' && address && address.length <= 200 && !/\s/.test(address)) return address;
+  } catch { /* A bundled address remains a valid deployment fallback. */ }
+  return typeof bundled === 'string' && bundled.length <= 200 && !/\s/.test(bundled) ? bundled : '';
+}
 function decodeConnectorKey(value, codec, networkId) {
   if (typeof value !== 'string') throw new Error('The wallet returned an invalid shielded key.');
   if (/^[a-f0-9]{64}$/i.test(value)) return value.toLowerCase();
@@ -47,7 +56,8 @@ function privateStateProvider() {
 }
 
 export async function connectCompact(walletId) {
-  if (!CONTRACT_ADDRESS) throw new Error('The Compact contract address is not configured. Simulation remains available, but no on-chain success will be shown.');
+  const contractAddress = await configuredContractAddress();
+  if (!contractAddress) throw new Error('The Compact contract address is not configured. Simulation remains available, but no on-chain success will be shown.');
   const available = discoverCompactWallets();
   const selected = available.find((item) => item.id === walletId) || (available.length === 1 ? available[0] : null);
   if (!selected) throw new Error(available.length ? 'Choose a compatible Midnight wallet first.' : 'No compatible Midnight wallet was detected. Install or enable a wallet implementing Connector API v4 and refresh.');
@@ -81,9 +91,9 @@ export async function connectCompact(walletId) {
     midnightProvider: { async submitTx(tx) { await wallet.submitTransaction(hex(tx.serialize())); return tx.identifiers()[0]; } }
   };
   const compiledContract = CompiledContract.make('Aletheia', Aletheia.Contract).pipe(CompiledContract.withWitnesses(witnesses), CompiledContract.withCompiledFileAssets(window.location.origin));
-  await findDeployedContract(providers, { contractAddress: CONTRACT_ADDRESS, compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
-  context = { providers, compiledContract, contractAddress: CONTRACT_ADDRESS };
-  return { contractAddress: CONTRACT_ADDRESS, network: status.networkId, walletName: selected.name, walletId: selected.id };
+  await findDeployedContract(providers, { contractAddress, compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
+  context = { providers, compiledContract, contractAddress };
+  return { contractAddress, network: status.networkId, walletName: selected.name, walletId: selected.id };
 }
 
 function emptyState() { return { age: 0n, jurisdiction: 0n, householdSize: 0n, annualIncome: 0n, credentialId: new Uint8Array(32), signature: { announcement: { x: 0n, y: 1n }, response: 0n }, providerId: 0n, userSecret: sessionUserSecret }; }

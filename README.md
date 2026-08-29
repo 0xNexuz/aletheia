@@ -72,7 +72,7 @@ npm test
 npm run typecheck
 ```
 
-Set `ALETHEIA_DEMO_ISSUER_SECRET` (32-byte server-side hex) and `VITE_ALETHEIA_CONTRACT_ADDRESS` (deployed Preprod address). Never use the demo issuer for beneficiary decisions. Production requires an accountable issuer, independent chain confirmation, appeals, redemption reconciliation, and managed keys.
+Set `ALETHEIA_DEMO_ISSUER_SECRET` (32-byte server-side hex) and `ALETHEIA_CONTRACT_ADDRESS` (deployed Preprod address) in the hosted service. `VITE_ALETHEIA_CONTRACT_ADDRESS` remains an optional build-time fallback. Never use the demo issuer for beneficiary decisions. Production requires an accountable issuer, independent chain confirmation, appeals, redemption reconciliation, and managed keys.
 
 ## Feedback ownership
 

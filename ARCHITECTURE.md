@@ -15,7 +15,7 @@ sequenceDiagram
   O-->>C: 15-minute reservation
   C->>P: Private witnesses + claim circuit
   P-->>C: Zero-knowledge proof
-  C->>M: Lace-approved Compact transaction
+  C->>M: Wallet-approved Compact transaction
   M-->>C: Transaction ID + block reference
   C->>O: Transaction evidence
   O-->>C: Signed allocation receipt

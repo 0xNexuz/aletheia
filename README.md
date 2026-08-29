@@ -2,7 +2,7 @@
 
 **Prevent duplicate aid claims and over-allocation without building a public identity database.**
 
-[Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md)
+[Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Wave 1 progress](WAVE1_PROGRESS.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md)
 
 ## Submission snapshot
 
@@ -39,7 +39,7 @@ The UI never fabricates a transaction hash. If no contract address is configured
 3. Keep eligibility answers and the claimant secret in the browser.
 4. Obtain a signed demo credential bound to the private claimant commitment.
 5. Reserve operational inventory before spending proving resources.
-6. Generate the ZK proof and approve the Compact call in Lace.
+6. Generate the ZK proof and approve the Compact call in the selected Connector API v4 wallet.
 7. Record transaction, block, contract, nullifier, inventory, and receipt evidence.
 8. Retry the same program to see duplicate rejection; another program derives a different nullifier.
 
@@ -50,7 +50,7 @@ flowchart LR
   subgraph Device["Claimant device — private boundary"]
     UI["Locked Aletheia UI"] --> PS["Private answers + secret"]
     PS --> MC["Midnight.js client"]
-    Lace["Lace Preprod wallet"] <--> MC
+    Wallet["Compatible Midnight Preprod wallet"] <--> MC
   end
   Issuer["Signed demo issuer API"] -->|"credential + Schnorr signature"| MC
   MC -->|"private witnesses"| Compact["Compact claim circuit"]
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Run and validate
 
-Full-path requirements: Node.js 22+, Compact toolchain `0.31.1`, Compact devtools `0.5.1`, proof server `8.1.0`, Midnight.js `4.1.1`, Lace on Preprod, and funded tNIGHT/tDUST.
+Full-path requirements: Node.js 22+, Compact toolchain `0.31.1`, Compact devtools `0.5.1`, proof server `8.1.0` or wallet-provided proving, Midnight.js `4.1.1`, a Connector API v4 wallet on Preprod, and funded tNIGHT/tDUST.
 
 ```bash
 npm install
@@ -80,4 +80,4 @@ The inquiry form writes to the project owner’s private Sites database and retu
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE).

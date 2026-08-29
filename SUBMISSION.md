@@ -7,7 +7,6 @@
 - Public repository: https://github.com/0xNexuz/aletheia
 - Live product: https://alethia-pi.vercel.app
 - Slide deck: [submission/Aletheia_Midnight_Buildathon_Wave1.pptx](submission/Aletheia_Midnight_Buildathon_Wave1.pptx)
-- Demo pitch script and storyboard: [submission/DEMO_PITCH_SCRIPT.md](submission/DEMO_PITCH_SCRIPT.md)
 - Demo video URL: pending Clueso authentication and export
 - Wave 1 changes: [WAVE1_PROGRESS.md](WAVE1_PROGRESS.md)
 

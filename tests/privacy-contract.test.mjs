@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 const client = await readFile(new URL('../script.js', import.meta.url), 'utf8');
 const server = await readFile(new URL('../dist/server/index.js', import.meta.url), 'utf8');
 const bridge = await readFile(new URL('../api/_bridge.js', import.meta.url), 'utf8');
+const healthBridge = await readFile(new URL('../api/health.js', import.meta.url), 'utf8');
 const page = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const compactClient = await readFile(new URL('../src/midnight-client.js', import.meta.url), 'utf8');
 const contract = await readFile(new URL('../contract/src/aletheia.compact', import.meta.url), 'utf8');
@@ -12,6 +13,7 @@ test('duplicate guard is program scoped', () => { assert.match(client, /aletheia
 test('metrics report explicit attempt and inventory totals', () => { assert.match(server, /attemptedClaims = validClaims \+ duplicateClaimsStopped/); assert.match(server, /remainingSupplies/); assert.doesNotMatch(server, /protocolSuccess/); });
 test('inventory is atomically capped', () => { assert.match(server, /trg_claim_records_capacity_guard/); assert.match(server, /PROGRAM_CAPACITY_REACHED/); assert.match(server, /PROGRAM_FULL/); });
 test('bridge uses server-only bearer authorization', () => { assert.match(bridge, /OAI-Sites-Authorization/); assert.match(bridge, /Bearer \$\{SITES_TOKEN\}/); });
+test('hosted contract address activates Compact mode without rebuilding the browser bundle', () => { assert.match(compactClient, /fetch\('\/api\/health'/); assert.match(compactClient, /health\?\.midnightNetwork === 'preprod'/); assert.match(healthBridge, /forwardAlethia\(req, res, '\/api\/health'/); });
 test('page labels simulation and Compact modes honestly', () => { assert.match(page, /Clearly labeled simulation/i); assert.match(page, /Compact only succeeds with a deployed Preprod contract/i); });
 test('Midnight flow submits a Compact call and records evidence', () => { assert.match(compactClient, /submitCallTx/); assert.match(compactClient, /circuitId: 'claim'/); assert.match(compactClient, /submitTransaction/); assert.match(server, /compact_submitted/); assert.match(server, /contract_address/); });
 test('compatible Midnight wallets are discovered without a Lace-only dependency', () => { assert.match(compactClient, /discoverCompactWallets/); assert.match(compactClient, /apiVersion/); assert.match(compactClient, /getProvingProvider/); assert.doesNotMatch(compactClient, /\.mnLace/); assert.match(page, /any compatible Midnight Connector API v4 wallet/i); });

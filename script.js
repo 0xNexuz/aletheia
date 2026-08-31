@@ -131,7 +131,7 @@ async function connectMidnightWallet() {
 document.querySelectorAll('.wallet-choice').forEach((button) => button.addEventListener('click', () => button.dataset.wallet === 'midnight' ? connectMidnightWallet() : connectTestWallet()));
 document.querySelector('#refresh-midnight-wallets').addEventListener('click', refreshMidnightWallets);
 window.addEventListener('focus', refreshMidnightWallets);
-const developerDeployMode = new URLSearchParams(window.location.search).get('deploy') === '1';
+const developerDeployMode = new window.URLSearchParams(window.location.search).get('deploy') === '1';
 if (developerDeployMode) {
   developerDeploy.hidden = false;
   developerDeploy.classList.add('deployment-dock');

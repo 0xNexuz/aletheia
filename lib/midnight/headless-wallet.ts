@@ -47,7 +47,14 @@ export async function createPreprodKeystore(file = PREPROD_KEYSTORE) {
 }
 
 export async function loadEnvironmentSeed(environment: 'local' | 'preprod') {
-  return environment === 'local' ? LOCAL_GENESIS_SEED : readEncryptedSeed(PREPROD_KEYSTORE);
+  if (environment === 'local') return LOCAL_GENESIS_SEED;
+  const injected = process.env.ALETHEIA_PREPROD_WALLET_SEED;
+  if (injected !== undefined) {
+    const normalized = injected.trim().replace(/^0x/, '').toLowerCase();
+    if (!/^[a-f0-9]{64}$/.test(normalized)) throw new Error('ALETHEIA_PREPROD_WALLET_SEED_INVALID');
+    return normalized;
+  }
+  return readEncryptedSeed(PREPROD_KEYSTORE);
 }
 
 function walletConfiguration(config: ReturnType<typeof getMidnightConfig>) {
@@ -83,6 +90,13 @@ export async function openHeadlessWallet(environment: 'local' | 'preprod') {
 
 export async function waitForWalletState(wallet: WalletFacade, timeoutMs = 180_000) {
   return Rx.firstValueFrom(wallet.state().pipe(Rx.filter((state) => state.isSynced), Rx.timeout({ first: timeoutMs })));
+}
+
+export async function waitForDustReady(wallet: WalletFacade, timeoutMs = 1_200_000) {
+  return Rx.firstValueFrom(wallet.state().pipe(
+    Rx.filter((state) => state.isSynced && classifyWalletReadiness(state) === 'DUST_READY'),
+    Rx.timeout({ first: timeoutMs })
+  ));
 }
 
 export function publicWalletSummary(state: any, unshieldedKeystore: any) {

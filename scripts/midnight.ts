@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getMidnightConfig, classifyWalletReadiness, assertEvidenceSafe, readinessExitCode } from '../lib/midnight/protocol.js';
-import { PREPROD_KEYSTORE, closeHeadlessWallet, createPreprodKeystore, openHeadlessWallet, publicWalletSummary, registerNightForDust, waitForWalletState } from '../lib/midnight/headless-wallet.js';
+import { PREPROD_KEYSTORE, closeHeadlessWallet, createPreprodKeystore, openHeadlessWallet, publicWalletSummary, registerNightForDust, waitForDustReady, waitForWalletState } from '../lib/midnight/headless-wallet.js';
 import { createClaimEngine } from '../lib/midnight/claim-engine.js';
 
 type Environment = 'local' | 'preprod';
@@ -44,11 +44,26 @@ async function status(env: Environment) {
 }
 
 async function walletCommand() {
-  try { await access(PREPROD_KEYSTORE); } catch { await createPreprodKeystore(); }
+  if (!process.env.ALETHEIA_PREPROD_WALLET_SEED) {
+    try { await access(PREPROD_KEYSTORE); } catch { await createPreprodKeystore(); }
+  }
   output(await withWallet('preprod', async (context) => publicWalletSummary(await waitForWalletState(context.wallet), context.unshieldedKeystore)));
 }
 
 async function dustRegister(env: Environment) { output(await withWallet(env, registerNightForDust)); }
+
+async function prepare(env: Environment) {
+  output(await withWallet(env, async (context) => {
+    const initial = await waitForWalletState(context.wallet);
+    const readiness = classifyWalletReadiness(initial);
+    if (readiness === 'NO_NIGHT') throw new Error('NO_NIGHT');
+    const registration = readiness === 'NIGHT_NOT_REGISTERED_FOR_DUST'
+      ? await registerNightForDust(context)
+      : { submitted: false, readiness };
+    const ready = readiness === 'DUST_READY' ? initial : await waitForDustReady(context.wallet);
+    return { registration, wallet: publicWalletSummary(ready, context.unshieldedKeystore) };
+  }));
+}
 
 async function deploy(env: Environment) {
   await withWallet(env, async (context) => {
@@ -79,6 +94,7 @@ try {
   if (command === 'status') await status(environment);
   else if (command === 'wallet' && environment === 'preprod') await walletCommand();
   else if (command === 'dust-register') await dustRegister(environment);
+  else if (command === 'prepare') await prepare(environment);
   else if (command === 'deploy') await deploy(environment);
   else if (command === 'claim') await claim(environment);
   else if (command === 'duplicate') await duplicate(environment);

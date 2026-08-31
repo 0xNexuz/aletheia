@@ -1,0 +1,68 @@
+name: Midnight Preprod Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Inspect the CI wallet or prepare DUST and deploy Aletheia
+        required: true
+        default: wallet
+        type: choice
+        options:
+          - wallet
+          - deploy
+
+permissions:
+  contents: read
+
+jobs:
+  midnight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ALETHEIA_PREPROD_WALLET_SEED: ${{ secrets.ALETHEIA_PREPROD_WALLET_SEED }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Validate deployment secret
+        shell: bash
+        run: |
+          if [[ ! "$ALETHEIA_PREPROD_WALLET_SEED" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            echo "::error::ALETHEIA_PREPROD_WALLET_SEED is missing or invalid"
+            exit 1
+          fi
+      - name: Install dependencies
+        run: npm ci
+      - name: Show Preprod wallet
+        run: npm run midnight:wallet:preprod
+      - name: Start Midnight proof server
+        if: inputs.operation == 'deploy'
+        run: |
+          docker run --detach --name midnight-proof-server --publish 6300:6300 midnightntwrk/proof-server:8.1.0 midnight-proof-server -v
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:6300/version; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs midnight-proof-server
+          exit 1
+      - name: Register NIGHT and wait for spendable DUST
+        if: inputs.operation == 'deploy'
+        run: npm run midnight:prepare:preprod
+      - name: Deploy and configure Aletheia
+        if: inputs.operation == 'deploy'
+        run: npm run midnight:deploy:preprod
+      - name: Upload deployment evidence
+        if: inputs.operation == 'deploy'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aletheia-midnight-preprod-evidence
+          path: |
+            .midnight/deployments/preprod.json
+            evidence/deployment-preprod-*.json
+          if-no-files-found: error
+          retention-days: 30

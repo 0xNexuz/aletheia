@@ -1,3 +1,4 @@
+import './src/browser-polyfills.js';
 import { connectCompact, deployCompact, discoverCompactWallets, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
 
 const menuButton = document.querySelector('.menu-toggle');
@@ -130,8 +131,21 @@ async function connectMidnightWallet() {
 document.querySelectorAll('.wallet-choice').forEach((button) => button.addEventListener('click', () => button.dataset.wallet === 'midnight' ? connectMidnightWallet() : connectTestWallet()));
 document.querySelector('#refresh-midnight-wallets').addEventListener('click', refreshMidnightWallets);
 window.addEventListener('focus', refreshMidnightWallets);
-setTimeout(refreshMidnightWallets, 250);
-if (new URLSearchParams(window.location.search).get('deploy') === '1') developerDeploy.hidden = false;
+const developerDeployMode = new URLSearchParams(window.location.search).get('deploy') === '1';
+if (developerDeployMode) {
+  developerDeploy.hidden = false;
+  developerDeploy.classList.add('deployment-dock');
+  deployButton.textContent = 'Connect 1AM & deploy to Preprod';
+  developerDeploy.insertBefore(walletStatus, deployButton);
+  setTimeout(() => {
+    const wallets = refreshMidnightWallets();
+    walletStatus.textContent = wallets.length
+      ? `${wallets.length === 1 ? wallets[0].name : `${wallets.length} compatible wallets`} detected. Click below to connect and deploy.`
+      : '1AM is not detected in this browser. Open this URL in the Chrome profile where the 1AM extension is enabled, then refresh.';
+  }, 250);
+} else {
+  setTimeout(refreshMidnightWallets, 250);
+}
 deployButton?.addEventListener('click', async () => {
   deployButton.disabled = true; deploymentEvidence.hidden = true;
   try {

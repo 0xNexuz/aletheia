@@ -8,6 +8,7 @@
     "contract"
   ],
   "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 3000",
     "compact": "npm run compact -w contract",
     "prebuild": "node scripts/ensure-compact.mjs",
     "build:contract": "npm run build -w contract",
@@ -18,6 +19,7 @@
     "midnight:status:preprod": "tsx scripts/midnight.ts status preprod",
     "midnight:wallet:preprod": "tsx scripts/midnight.ts wallet preprod",
     "midnight:dust:register:preprod": "tsx scripts/midnight.ts dust-register preprod",
+    "midnight:prepare:preprod": "tsx scripts/midnight.ts prepare preprod",
     "midnight:deploy:local": "tsx scripts/midnight.ts deploy local",
     "midnight:deploy:preprod": "tsx scripts/midnight.ts deploy preprod",
     "midnight:claim:local": "tsx scripts/midnight.ts claim local",

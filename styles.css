@@ -316,6 +316,9 @@ em { font-family: var(--text-serif); font-weight: 400; }
 .developer-deploy[hidden] { display: none; }
 .developer-deploy p { margin: 0 0 10px; color: var(--muted); font: 10px/1.5 var(--text-serif); }
 .developer-deploy pre { max-height: 180px; margin: 12px 0 0; padding: 10px; overflow: auto; background: var(--ink); color: var(--cream); font-size: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.developer-deploy.deployment-dock { position: fixed; top: 72px; right: 18px; z-index: 1000; width: min(420px, calc(100vw - 36px)); margin: 0; border: 1px solid var(--teal-dark); border-radius: 12px; background: #fffdf7; box-shadow: 0 16px 48px rgba(33,55,49,.2); }
+.developer-deploy.deployment-dock .inline-status { display: block; margin: 10px 0; font-size: 11px; }
+.developer-deploy.deployment-dock pre { max-height: 260px; }
 .disclosure-preview { display: grid; grid-template-columns: 75px 1fr; gap: 9px 15px; margin: -15px 0 28px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 10px; }
 .disclosure-preview span { color: var(--muted); }.disclosure-preview b { font-weight: 600; }
 .proof-denied .proof-ring { border-color: var(--red); color: var(--red); }

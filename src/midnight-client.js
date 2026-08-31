@@ -6,6 +6,7 @@ import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-conf
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import { createProofProvider } from '@midnight-ntwrk/midnight-js-types';
 import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } from '@midnight-ntwrk/wallet-sdk-address-format';
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 
@@ -69,7 +70,7 @@ async function connectWallet(walletId) {
   const stateProvider = privateStateProvider();
   const zkConfigProvider = new FetchZkConfigProvider(window.location.origin, fetch.bind(window));
   const proofProvider = typeof wallet.getProvingProvider === 'function'
-    ? await wallet.getProvingProvider(zkConfigProvider.asKeyMaterialProvider())
+    ? createProofProvider(await wallet.getProvingProvider(zkConfigProvider.asKeyMaterialProvider()))
     : config.proverServerUri ? httpClientProofProvider(config.proverServerUri, zkConfigProvider) : null;
   if (!proofProvider) throw new Error(`${selected.name} does not provide a compatible proving service.`);
   const coinPublicKey = decodeConnectorKey(addresses.shieldedCoinPublicKey, ShieldedCoinPublicKey.codec, status.networkId);

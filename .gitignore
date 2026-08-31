@@ -12,3 +12,4 @@ midnight-local-dev/
 *.wallet-keystore.json
 tmp/
 *.inspect.ndjson
+.env*.local

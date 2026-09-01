@@ -36,6 +36,8 @@ jobs:
           fi
       - name: Install dependencies
         run: npm ci
+      - name: Build Compact contract package
+        run: npm run build:contract
       - name: Show Preprod wallet
         run: npm run midnight:wallet:preprod
       - name: Start Midnight proof server

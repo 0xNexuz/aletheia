@@ -15,7 +15,7 @@ function signedState(age = 34n): AletheiaPrivateState {
   const userSecret = new Uint8Array(32).fill(9);
   const credentialId = new Uint8Array(32).fill(8);
   const announcement = ecMulGenerator(456n);
-  const message = [age, 566n, 4n, 1800000n, transientHash(Bytes32Descriptor, credentialId), transientHash(Bytes32Descriptor, userSecret)];
+  const message: [bigint, bigint, bigint, bigint, bigint, bigint] = [age, 566n, 4n, 1800000n, transientHash(Bytes32Descriptor, credentialId), transientHash(Bytes32Descriptor, userSecret)];
   const challenge = pureCircuits.schnorrChallenge(announcement.x, announcement.y, publicKey.x, publicKey.y, message) % (2n ** 248n);
   return { age, jurisdiction: 566n, householdSize: 4n, annualIncome: 1800000n, credentialId, providerId: 1n, userSecret,
     signature: { announcement, response: (456n + challenge * issuerSecret) % order } };

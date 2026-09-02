@@ -18,7 +18,7 @@ permissions:
 jobs:
   midnight:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       ALETHEIA_PREPROD_WALLET_SEED: ${{ secrets.ALETHEIA_PREPROD_WALLET_SEED }}
     steps:

@@ -1,6 +1,7 @@
 import './src/browser-polyfills.js';
-import { deployCompact, discoverCompactWallets } from './src/midnight-client.js';
+import { deployCompact, discoverCompactWallets, retryCompact } from './src/midnight-client.js';
 import { createRecovery, importRecovery, readRecovery, unlockRecovery, withDeploymentLock } from './src/deployment-recovery.js';
+import { lookupDeployment } from './src/deployment-status.js';
 
 const byId = (id) => document.getElementById(id);
 const walletSelect = byId('wallet');
@@ -19,6 +20,10 @@ function render() {
   byId('prepare-recovery').disabled = busy;
   byId('import-recovery').disabled = busy;
   byId('refresh-wallets').disabled = busy;
+  byId('check-submission').disabled = busy || !record?.pendingTransactionId;
+  byId('retry-panel').hidden = !record?.started || !!record?.contractAddress || record?.completed === true;
+  byId('retry-approved').disabled = busy;
+  byId('retry-deployment').disabled = busy || !recovery || !byId('backup-confirmed').checked || !byId('retry-approved').checked || !walletSelect.value;
   walletSelect.disabled = busy || !walletSelect.value;
   byId('contract-address').disabled = busy;
   byId('backup-confirmed').disabled = busy || !recovery;
@@ -26,7 +31,7 @@ function render() {
   deployButton.textContent = record?.started || byId('contract-address').value.trim() ? 'Connect 1AM & resume setup' : 'Connect 1AM & deploy safely';
   if (record) {
     if (!byId('contract-address').value) byId('contract-address').value = record.contractAddress || '';
-    evidence.textContent = JSON.stringify({ network: record.network, contractAddress: record.contractAddress, pendingTransactionId: record.pendingTransactionId, configured: record.completed === true, transactions: record.transactions }, null, 2);
+    evidence.textContent = JSON.stringify({ network: record.network, contractAddress: record.contractAddress, pendingTransactionId: record.pendingTransactionId, submissionStatus: record.submissionStatus || (record.started ? 'legacy-result-not-recorded' : 'not-started'), lastSubmissionError: record.lastSubmissionError, previousAttempts: record.previousAttempts, configured: record.completed === true, transactions: record.transactions }, null, 2);
     evidence.hidden = false;
   }
 }
@@ -89,7 +94,21 @@ byId('download-recovery').addEventListener('click', () => {
 });
 
 byId('refresh-wallets').addEventListener('click', refreshWallets);
+byId('check-submission').addEventListener('click', () => run(async () => {
+  const record = readRecovery(window.localStorage);
+  status.textContent = 'Checking the official Preprod indexer. This does not submit a transaction.';
+  const result = await lookupDeployment(record?.pendingTransactionId);
+  if (result.status === 'confirmed') {
+    byId('contract-address').value = result.contractAddress;
+    status.textContent = `Deployment confirmed in block ${result.blockHeight}. Unlock your recovery and resume setup; do not deploy again.`;
+  } else if (result.status === 'unconfirmed') {
+    status.textContent = 'The saved ID is not confirmed on Preprod. This does not prove it was never submitted. Keep your recovery; no new deployment was sent.';
+  } else {
+    status.textContent = `Transaction found with result ${result.result || 'unknown'}; inspect its result before doing anything else. No new deployment was sent.`;
+  }
+}));
 byId('backup-confirmed').addEventListener('change', render);
+byId('retry-approved').addEventListener('change', render);
 byId('contract-address').addEventListener('input', render);
 walletSelect.addEventListener('change', render);
 window.addEventListener('focus', refreshWallets);
@@ -98,6 +117,12 @@ deployButton.addEventListener('click', () => run(async () => {
     ...recovery, contractAddress: byId('contract-address').value, backupConfirmed: byId('backup-confirmed').checked
   });
   status.textContent = `${result.walletName}: deployment and all four setup steps verified on Preprod. A real claim still remains.`;
+}, false));
+byId('retry-deployment').addEventListener('click', () => run(async () => {
+  const result = await retryCompact(walletSelect.value, (message) => { status.textContent = message; }, {
+    ...recovery, backupConfirmed: byId('backup-confirmed').checked, retryApproved: byId('retry-approved').checked
+  });
+  status.textContent = `${result.walletName}: deployment and setup verified on Preprod. Save an updated recovery backup. A real claim still remains.`;
 }, false));
 render();
 setTimeout(refreshWallets, 250);

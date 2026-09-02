@@ -20,6 +20,7 @@ The public repository already demonstrated the product idea, a Compact contract 
 - Added Linux-safe lockfile and CI handling for reproducible Compact builds.
 - Deployed Aletheia to Midnight Preprod and independently verified the indexed `ContractDeploy` transaction, contract address, and block.
 - Replaced the legacy memory-only browser admin key with encrypted device-local recovery and a downloadable backup. Setup can resume after closing the tab and checks on-chain state before requesting remaining approvals.
+- Added read-only pending-transaction reconciliation, durable wallet-submission status, redacted failure details, and an explicit-consent retry path that retains the same encrypted key and archives previous IDs. The application suite now has 43 passing tests; this is local verification, not proof of a replacement deployment.
 
 ## Validation evidence
 

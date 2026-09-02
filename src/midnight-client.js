@@ -11,6 +11,7 @@ import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } f
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 import { readRecovery, saveRecovery, withDeploymentLock } from './deployment-recovery.js';
 import { configureDeployment } from './deployment-setup.js';
+import { lookupDeployment, prepareRetry, submitTracked } from './deployment-status.js';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
 let context;
@@ -121,7 +122,20 @@ async function deployOrResume(walletId, onState, recovery) {
     // Verify the supplied address and admin key before saving this override.
   }
   let contractAddress = record.contractAddress || suppliedAddress;
-  if (!contractAddress && record.started) throw new Error('A deployment may already have been submitted. Find its contract address using the saved transaction ID, paste it above, and resume. No duplicate deployment was sent.');
+  if (!contractAddress && record.started) {
+    onState('Checking the saved transaction on Preprod; no new transaction is being sent.');
+    const result = await lookupDeployment(record.pendingTransactionId);
+    if (result.status !== 'confirmed') throw new Error(`The saved attempt is ${result.status}. No new deployment was sent.${record.lastSubmissionError ? ` Last submission error: ${record.lastSubmissionError}` : ''}`);
+    contractAddress = result.contractAddress;
+  }
+  if (!contractAddress) {
+    // An older attempt can appear after a retry was authorized. Reconcile before rebuilding.
+    for (const attempt of record.previousAttempts || []) {
+      const older = await lookupDeployment(attempt.pendingTransactionId);
+      if (older.status === 'confirmed') { contractAddress = older.contractAddress; break; }
+      if (older.status !== 'unconfirmed') throw new Error('An older attempt is indexed and requires review before a new deployment.');
+    }
+  }
   if (!contractAddress) {
     const existing = await configuredContractAddress();
     if (existing) throw new Error(`A Preprod contract is already configured at ${existing}.`);
@@ -156,8 +170,8 @@ async function deployOrResume(walletId, onState, recovery) {
     const submit = providers.midnightProvider.submitTx;
     providers.midnightProvider.submitTx = async (tx) => {
       // Save before broadcast. If confirmation is interrupted, never silently deploy again.
-      checkpoint({ started: true, pendingTransactionId: String(tx.identifiers()[0]) });
-      return submit(tx);
+      onState('Sending the approved transaction through 1AM; waiting for its submission result.');
+      return submitTracked({ submit, tx, identifier: String(tx.identifiers()[0]), checkpoint });
     };
     onState('Approve contract deployment in 1AM. Your encrypted admin backup is saved.');
     deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState });
@@ -170,6 +184,23 @@ async function deployOrResume(walletId, onState, recovery) {
   checkpoint({ completed: true });
   context = { providers, compiledContract, contractAddress };
   return { contractAddress, network: 'preprod', walletName: selected.name, transactions };
+}
+
+export async function retryCompact(walletId, onState, recovery) {
+  if (!recovery?.secret || recovery.secret.length !== 32 || !recovery.backupConfirmed || !recovery.retryApproved) throw new Error('Unlock your existing recovery, confirm the backup and acknowledge the fresh-attempt risk first.');
+  return withDeploymentLock(navigator.locks, async () => {
+    const record = readRecovery(window.localStorage);
+    if (!record || record.vault.ciphertext !== recovery.record.vault.ciphertext) throw new Error('Saved recovery changed. Unlock it again.');
+    onState('Checking the old attempt on Preprod before retrying.');
+    const observed = await lookupDeployment(record.pendingTransactionId);
+    if (observed.status === 'confirmed') {
+      return deployOrResume(walletId, onState, { ...recovery, contractAddress: observed.contractAddress });
+    }
+    const next = prepareRetry(record, observed, recovery.retryApproved);
+    saveRecovery(window.localStorage, next);
+    onState('Old ID preserved. Preparing a fresh deployment with the same saved admin key.');
+    return deployOrResume(walletId, onState, { ...recovery, record: next, contractAddress: '' });
+  });
 }
 
 function emptyState() { return { age: 0n, jurisdiction: 0n, householdSize: 0n, annualIncome: 0n, credentialId: new Uint8Array(32), signature: { announcement: { x: 0n, y: 1n }, response: 0n }, providerId: 0n, userSecret: sessionUserSecret }; }

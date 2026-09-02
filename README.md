@@ -34,6 +34,8 @@ The deployment transaction is indexed on Midnight Preprod as a `ContractDeploy` 
 
 The repaired `/deploy.html` flow requires a passphrase-protected application-admin recovery file before deployment. Keep the encrypted file and passphrase separately; never commit a recovery file or enter a wallet seed. Reopen the same origin, unlock the saved recovery (or import its backup), and resume. Setup checks the on-chain admin commitment and skips matching issuer/program entries. If confirmation was interrupted before saving the address, use the recorded transaction ID to find the contract address; do not start another deployment blindly. This recovery is for the application's admin circuits, not wallet access or SDK contract-maintenance keys.
 
+Use **Check saved transaction** for a read-only Preprod lookup. Wallet acceptance is recorded separately from chain confirmation; submission failures retain a redacted error and never clear the pending marker. If an attempt is unconfirmed, an explicitly acknowledged fresh attempt can retain the same encrypted key and archive the old ID. An empty indexer response is not proof of non-submission: both attempts could later land and consume testnet DUST. The retry path checks again and resumes a confirmed deployment instead of knowingly duplicating it.
+
 ## Claim flow
 
 1. Select Food Support, Medical Assistance, or Temporary Shelter.

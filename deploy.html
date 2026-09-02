@@ -50,9 +50,15 @@
       <label for="wallet">Detected Connector API v4 wallet</label>
       <select id="wallet" disabled><option>Looking for 1AM…</option></select>
       <button id="refresh-wallets" type="button">Refresh wallet detection</button>
+      <button id="check-submission" type="button" disabled>Check saved transaction (no submission)</button>
       <label for="contract-address" class="recovery-label">Contract address to resume (leave empty for a new deployment)</label>
       <input id="contract-address" type="text" maxlength="64" spellcheck="false" autocomplete="off" placeholder="64-character contract address, not transaction hash">
       <button id="deploy" type="button" disabled>Connect 1AM & deploy safely</button>
+      <div id="retry-panel" hidden>
+        <p class="note">If the saved attempt remains unconfirmed, you can authorize a fresh deployment with the same admin key. The old attempt could still land later, creating a second contract and using extra Preprod DUST. Its ID and your recovery key will be kept. No reset or transaction happens until you click the retry button.</p>
+        <label><input id="retry-approved" type="checkbox">I authorize a fresh attempt and accept the possible duplicate contract and extra testnet DUST.</label>
+        <button id="retry-deployment" type="button" disabled>Retry unconfirmed deployment — keep my key</button>
+      </div>
       <p id="status" aria-live="polite">Create or unlock your encrypted admin recovery first.</p>
       <pre id="evidence" hidden></pre>
     </section>

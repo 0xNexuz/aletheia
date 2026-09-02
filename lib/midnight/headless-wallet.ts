@@ -61,7 +61,7 @@ export async function derivePreprodFundingAddress() {
   setNetworkId('preprod');
   const seed = await loadEnvironmentSeed('preprod');
   const keys = deriveKeys(seed);
-  return createKeystore(keys[Roles.NightExternal], getNetworkId()).getBech32Address();
+  return createKeystore(keys[Roles.NightExternal], getNetworkId()).getBech32Address().toString();
 }
 
 function walletConfiguration(config: ReturnType<typeof getMidnightConfig>) {
@@ -95,7 +95,7 @@ export async function openHeadlessWallet(environment: 'local' | 'preprod') {
   return { environment, config, wallet, shieldedSecretKeys, dustSecretKey, unshieldedKeystore, privateStoragePassword };
 }
 
-export async function waitForWalletState(wallet: WalletFacade, timeoutMs = 180_000) {
+export async function waitForWalletState(wallet: WalletFacade, timeoutMs = 900_000) {
   return Rx.firstValueFrom(wallet.state().pipe(Rx.filter((state) => state.isSynced), Rx.timeout({ first: timeoutMs })));
 }
 

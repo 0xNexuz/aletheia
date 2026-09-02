@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getMidnightConfig, classifyWalletReadiness, assertEvidenceSafe, readinessExitCode } from '../lib/midnight/protocol.js';
-import { PREPROD_KEYSTORE, closeHeadlessWallet, createPreprodKeystore, openHeadlessWallet, publicWalletSummary, registerNightForDust, waitForDustReady, waitForWalletState } from '../lib/midnight/headless-wallet.js';
+import { PREPROD_KEYSTORE, closeHeadlessWallet, createPreprodKeystore, derivePreprodFundingAddress, openHeadlessWallet, publicWalletSummary, registerNightForDust, waitForDustReady, waitForWalletState } from '../lib/midnight/headless-wallet.js';
 import { createClaimEngine } from '../lib/midnight/claim-engine.js';
 
 type Environment = 'local' | 'preprod';
@@ -47,7 +47,7 @@ async function walletCommand() {
   if (!process.env.ALETHEIA_PREPROD_WALLET_SEED) {
     try { await access(PREPROD_KEYSTORE); } catch { await createPreprodKeystore(); }
   }
-  output(await withWallet('preprod', async (context) => publicWalletSummary(await waitForWalletState(context.wallet), context.unshieldedKeystore)));
+  output({ networkId: 'preprod', unshieldedAddress: await derivePreprodFundingAddress() });
 }
 
 async function dustRegister(env: Environment) { output(await withWallet(env, registerNightForDust)); }

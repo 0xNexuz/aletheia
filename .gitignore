@@ -10,6 +10,7 @@ evidence/private/
 evidence/*.working.json
 midnight-local-dev/
 *.wallet-keystore.json
+*.admin-recovery.json
 tmp/
 *.inspect.ndjson
 .env*.local

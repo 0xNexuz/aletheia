@@ -23,14 +23,16 @@ Midnight is necessary because a normal database prevents duplicates by learning 
 | --- | --- | --- |
 | Compact eligibility, issuer, revocation, and nullifier circuit | **REAL SOURCE** | `contract/src/aletheia.compact` |
 | Signed Jubjub/Schnorr demo credentials | **REAL, DEMO ISSUER** | `api/credentials.js`, `lib/issuer.js` |
-| Browser proof generation and contract call | **REAL INTEGRATION; REQUIRES CONFIG** | `src/midnight-client.js` |
-| Midnight Preprod deployment | **NOT YET VERIFIED** | Requires compiled artifacts, funded owner wallet, proof server, and contract address |
+| Browser proof generation and contract call | **REAL INTEGRATION; CONFIGURATION PENDING** | `src/midnight-client.js` |
+| Midnight Preprod deployment | **VERIFIED ON CHAIN** | Contract `024108897068de067fd95a7422ce5d3ac341edf542eeba6bd76682effada3256`; [deployment evidence](evidence/deployment-preprod.json) |
 | Simulation claim path | **SIMULATED AND LABELED** | No blockchain/ZK claim is made |
 | Three program inventory caps | **REAL OPERATIONAL BACKEND** | Atomic D1 triggers and reservations |
 | Signed receipts and live aggregates | **REAL** | ECDSA P-256 receipts; private Sites database |
 | Inquiry inbox/email notification | **PARTIAL** | Stored privately; no owner inbox or email alert yet |
 
-The UI never fabricates a transaction hash. If no contract address is configured, Compact mode stops clearly and simulation remains available.
+The deployment transaction is indexed on Midnight Preprod as a `ContractDeploy` action in block `2368644`. This is historical deployment evidence, not an operational claim contract: its legacy browser-only admin key was lost when the deployment tab closed. A replacement deployment, issuer registration, program configuration, and the first claim remain pending.
+
+The repaired `/deploy.html` flow requires a passphrase-protected application-admin recovery file before deployment. Keep the encrypted file and passphrase separately; never commit a recovery file or enter a wallet seed. Reopen the same origin, unlock the saved recovery (or import its backup), and resume. Setup checks the on-chain admin commitment and skips matching issuer/program entries. If confirmation was interrupted before saving the address, use the recorded transaction ID to find the contract address; do not start another deployment blindly. This recovery is for the application's admin circuits, not wallet access or SDK contract-maintenance keys.
 
 ## Claim flow
 

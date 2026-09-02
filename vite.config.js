@@ -55,5 +55,6 @@ export default defineConfig({
     outDir: 'dist/client',
     emptyOutDir: true,
     target: 'esnext',
+    rollupOptions: { input: { main: 'index.html', deploy: 'deploy.html' } },
   },
 });

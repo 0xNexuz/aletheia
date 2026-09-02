@@ -9,6 +9,8 @@ import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { createProofProvider } from '@midnight-ntwrk/midnight-js-types';
 import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } from '@midnight-ntwrk/wallet-sdk-address-format';
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
+import { readRecovery, saveRecovery, withDeploymentLock } from './deployment-recovery.js';
+import { configureDeployment } from './deployment-setup.js';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
 let context;
@@ -102,31 +104,70 @@ export async function connectCompact(walletId) {
   return { contractAddress, network, walletName: selected.name, walletId: selected.id };
 }
 
-export async function deployCompact(walletId, onState = () => {}) {
-  const existing = await configuredContractAddress();
-  if (existing) throw new Error(`A Preprod contract is already configured at ${existing}.`);
-  const { selected, providers, compiledContract } = await connectWallet(walletId);
-  onState('Approve the Aletheia contract deployment in your wallet');
-  const deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
-  const deployment = deployed.deployTxData.public;
-  const contractAddress = String(deployment.contractAddress);
-  const transactions = [{ action: 'deploy', transactionId: String(deployment.txId), blockReference: String(deployment.blockHeight) }];
-  onState('Registering the signed demo issuer');
+export async function deployCompact(walletId, onState = () => {}, recovery) {
+  if (!recovery?.secret || recovery.secret.length !== 32 || !recovery.backupConfirmed) throw new Error('Open /deploy.html and save an encrypted admin recovery backup before deploying.');
+  return withDeploymentLock(navigator.locks, () => deployOrResume(walletId, onState, recovery));
+}
+
+async function deployOrResume(walletId, onState, recovery) {
+  const storage = window.localStorage;
+  let record = readRecovery(storage);
+  if (!record || record.vault.ciphertext !== recovery.record.vault.ciphertext) throw new Error('The saved recovery changed. Unlock the current recovery before continuing.');
+  const checkpoint = (changes) => { record = { ...record, ...changes }; saveRecovery(storage, record); recovery.record = record; };
+  const suppliedAddress = recovery.contractAddress?.trim().toLowerCase();
+  if (suppliedAddress) {
+    if (!/^[a-f0-9]{64}$/.test(suppliedAddress)) throw new Error('Enter a 64-character Preprod contract address, not a transaction hash.');
+    if (record.contractAddress && record.contractAddress !== suppliedAddress) throw new Error('That address differs from the saved deployment.');
+    // Verify the supplied address and admin key before saving this override.
+  }
+  let contractAddress = record.contractAddress || suppliedAddress;
+  if (!contractAddress && record.started) throw new Error('A deployment may already have been submitted. Find its contract address using the saved transaction ID, paste it above, and resume. No duplicate deployment was sent.');
+  if (!contractAddress) {
+    const existing = await configuredContractAddress();
+    if (existing) throw new Error(`A Preprod contract is already configured at ${existing}.`);
+  }
   const issuerResponse = await fetch('/api/credentials', { method: 'GET', cache: 'no-store' });
   const issuer = await issuerResponse.json();
-  if (!issuerResponse.ok || !issuer?.publicKey) throw new Error(issuer.error || 'The demo issuer configuration is unavailable.');
-  const registered = await deployed.callTx.registerProvider(BigInt(issuer.providerId), { x: BigInt(issuer.publicKey.x), y: BigInt(issuer.publicKey.y) });
-  transactions.push({ action: 'register-provider', transactionId: String(registered.public.txId), blockReference: String(registered.public.blockHeight) });
-  const policies = [
-    ['food-support-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 2500000n, active: true }],
-    ['medical-assistance-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 1n, maxAnnualIncome: 4000000n, active: true }],
-    ['temporary-shelter-2026', { minAge: 21n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 3000000n, active: true }]
-  ];
-  for (const [programId, policy] of policies) {
-    onState(`Configuring ${programId}`);
-    const configured = await deployed.callTx.configureProgram(await programBytes(programId), policy);
-    transactions.push({ action: `configure-${programId}`, transactionId: String(configured.public.txId), blockReference: String(configured.public.blockHeight) });
+  if (!issuerResponse.ok || !issuer?.publicKey || !/^\d+$/.test(issuer.providerId)) throw new Error(issuer.error || 'The demo issuer configuration is unavailable. No deployment was requested.');
+  const issuerIdentity = JSON.stringify({ providerId: issuer.providerId, publicKey: issuer.publicKey });
+  if (record.issuerIdentity && record.issuerIdentity !== issuerIdentity) throw new Error('The demo issuer changed since setup began. Restore the original issuer configuration before resuming.');
+  checkpoint({ issuerIdentity });
+  const { selected, providers, compiledContract } = await connectWallet(walletId);
+  const initialPrivateState = { ...emptyState(), userSecret: recovery.secret };
+  const readLedger = async () => {
+    const state = await providers.publicDataProvider.queryContractState(contractAddress);
+    if (!state) throw new Error('This contract is not indexed yet. Check the address and resume later; no replacement was deployed.');
+    const decoded = Aletheia.ledger(state.data);
+    if (hex(decoded.contractAdmin) !== hex(Aletheia.pureCircuits.deriveAdminCommitment(recovery.secret))) throw new Error('This recovery key is not the admin of that contract. Nothing was submitted.');
+    return decoded;
+  };
+  const transactions = [...(record.transactions || [])];
+  const onTransaction = async (action, result) => {
+    transactions.push({ action, transactionId: String(result.public.txId), blockReference: String(result.public.blockHeight) });
+    checkpoint({ transactions });
+  };
+  let deployed;
+  if (contractAddress) {
+    onState('Checking the existing deployment and recovery key.');
+    await readLedger();
+    checkpoint({ contractAddress, started: true });
+    deployed = await findDeployedContract(providers, { compiledContract, contractAddress, privateStateId: PRIVATE_STATE_ID, initialPrivateState });
+  } else {
+    const submit = providers.midnightProvider.submitTx;
+    providers.midnightProvider.submitTx = async (tx) => {
+      // Save before broadcast. If confirmation is interrupted, never silently deploy again.
+      checkpoint({ started: true, pendingTransactionId: String(tx.identifiers()[0]) });
+      return submit(tx);
+    };
+    onState('Approve contract deployment in 1AM. Your encrypted admin backup is saved.');
+    deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState });
+    providers.midnightProvider.submitTx = submit;
+    contractAddress = String(deployed.deployTxData.public.contractAddress);
+    checkpoint({ contractAddress, started: true });
+    await onTransaction('deploy', { public: deployed.deployTxData.public });
   }
+  await configureDeployment({ readLedger, callTx: deployed.callTx, issuer, programBytes, onState, onTransaction });
+  checkpoint({ completed: true });
   context = { providers, compiledContract, contractAddress };
   return { contractAddress, network: 'preprod', walletName: selected.name, transactions };
 }

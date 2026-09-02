@@ -43,7 +43,9 @@ Wave 1 materially extended the Midnight functionality: compiled managed artifact
 
 ## Honest deployment status
 
-The contract compiles and the client path is implemented. The repository does not claim a real Preprod transaction until a funded owner wallet, proof path, deployed contract address, and confirmed transaction hash are available.
+The legacy Aletheia contract was deployed on Midnight Preprod at `024108897068de067fd95a7422ce5d3ac341edf542eeba6bd76682effada3256`. Transaction `8edfd5b6494eeed8b558ea5d51da10073841fde9e436d3f26a3f053adebd5186` is indexed in block `2368644` with a `ContractDeploy` action. The public evidence is recorded in [evidence/deployment-preprod.json](evidence/deployment-preprod.json). Its in-memory admin key was lost when the legacy deployment tab closed; it is not an operational claim contract. A replacement using the encrypted recovery/resume flow is pending.
+
+Issuer registration, the three program-configuration calls, and the first real claim transaction remain pending. The submission does not claim those steps are complete.
 
 ## License
 

@@ -15,7 +15,10 @@
     p { color:var(--muted); line-height:1.6; }
     .panel { margin-top:26px; padding:20px; border:1px solid var(--line); border-radius:12px; background:white; }
     label { display:block; margin-bottom:8px; font-size:13px; font-weight:700; }
-    select,button { width:100%; min-height:48px; border-radius:10px; font:700 14px/1 inherit; }
+    select,button,input:not([type=checkbox]) { width:100%; min-height:48px; border-radius:10px; font:inherit; }
+    input:not([type=checkbox]) { padding:12px; border:1px solid var(--line); margin-bottom:12px; }
+    input[type=checkbox] { margin-right:8px; }
+    .recovery-label { margin-top:16px; }
     select { padding:0 12px; border:1px solid var(--line); background:white; color:var(--ink); }
     button { margin-top:12px; border:0; background:var(--teal); color:white; cursor:pointer; }
     button:disabled { cursor:not-allowed; opacity:.45; }
@@ -30,16 +33,30 @@
     <p class="brand">ALETHEIA · PROOF WITHOUT EXPOSURE</p>
     <span class="eyebrow">Midnight Preprod</span>
     <h1>Deploy with your 1AM wallet.</h1>
-    <p>This page performs one contract deployment, registers the demo issuer, and configures three aid programs. Your wallet will request five approvals.</p>
+    <p>Back up the application-admin key first, then deploy and configure three aid programs. A new setup needs five wallet approvals. Resuming skips steps already verified on-chain.</p>
+    <section class="panel" aria-label="Encrypted admin recovery">
+      <label for="recovery-password">Recovery passphrase — at least 12 characters</label>
+      <input id="recovery-password" type="password" minlength="12" autocomplete="off" placeholder="Choose a passphrase, not a wallet seed">
+      <label for="recovery-confirm">Confirm passphrase (new recovery only)</label>
+      <input id="recovery-confirm" type="password" minlength="12" autocomplete="off">
+      <button id="prepare-recovery" type="button">Create encrypted admin recovery</button>
+      <label for="import-recovery" class="recovery-label">Or enter your existing passphrase above and import an encrypted backup</label>
+      <input id="import-recovery" type="file" accept="application/json,.json">
+      <button id="download-recovery" type="button" disabled>Download encrypted recovery backup</button>
+      <label class="recovery-label"><input id="backup-confirmed" type="checkbox" disabled>I saved the encrypted backup and kept its passphrase separately.</label>
+      <p class="note">The encrypted application-admin key is saved only in this browser and your download. Its passphrase is not saved or sent to a server. This is not your wallet seed. Clearing browser data requires importing your backup; a lost passphrase cannot be recovered.</p>
+    </section>
     <section class="panel">
       <label for="wallet">Detected Connector API v4 wallet</label>
       <select id="wallet" disabled><option>Looking for 1AM…</option></select>
       <button id="refresh-wallets" type="button">Refresh wallet detection</button>
-      <button id="deploy" type="button" disabled>Connect 1AM & deploy Aletheia</button>
-      <p id="status" aria-live="polite">Waiting for the 1AM extension…</p>
+      <label for="contract-address" class="recovery-label">Contract address to resume (leave empty for a new deployment)</label>
+      <input id="contract-address" type="text" maxlength="64" spellcheck="false" autocomplete="off" placeholder="64-character contract address, not transaction hash">
+      <button id="deploy" type="button" disabled>Connect 1AM & deploy safely</button>
+      <p id="status" aria-live="polite">Create or unlock your encrypted admin recovery first.</p>
       <pre id="evidence" hidden></pre>
     </section>
-    <p class="note">Use this page only on <strong>http://localhost:3000</strong> in the Chrome profile where 1AM is installed and set to Preprod.</p>
+    <p class="note">Use the same origin, <strong>http://127.0.0.1:3000/deploy.html</strong>, in the Chrome profile where 1AM is installed and set to Preprod. Switching between localhost and 127.0.0.1 uses different browser storage; import your encrypted backup when switching.</p>
   </main>
   <script type="module" src="/deploy.js"></script>
 </body>

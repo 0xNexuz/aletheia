@@ -57,6 +57,13 @@ export async function loadEnvironmentSeed(environment: 'local' | 'preprod') {
   return readEncryptedSeed(PREPROD_KEYSTORE);
 }
 
+export async function derivePreprodFundingAddress() {
+  setNetworkId('preprod');
+  const seed = await loadEnvironmentSeed('preprod');
+  const keys = deriveKeys(seed);
+  return createKeystore(keys[Roles.NightExternal], getNetworkId()).getBech32Address();
+}
+
 function walletConfiguration(config: ReturnType<typeof getMidnightConfig>) {
   const indexerClientConnection = { indexerHttpUrl: config.indexer, indexerWsUrl: config.indexerWs };
   return {

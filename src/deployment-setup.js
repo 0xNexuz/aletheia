@@ -6,6 +6,25 @@ export const PROGRAM_POLICIES = [
 
 const same = (actual, expected) => Object.entries(expected).every(([name, value]) => actual[name] === value);
 
+/** @returns {Promise<[bigint, {x: bigint, y: bigint}, [Uint8Array, Uint8Array, Uint8Array]]>} */
+export async function deploymentArguments(issuer, programBytes) {
+  if (!/^\d+$/.test(String(issuer?.providerId)) || !/^\d+$/.test(String(issuer?.publicKey?.x)) || !/^\d+$/.test(String(issuer?.publicKey?.y))) throw new Error('A valid signed demo issuer must be configured before deployment.');
+  const providerId = BigInt(issuer.providerId);
+  const publicKey = { x: BigInt(issuer.publicKey.x), y: BigInt(issuer.publicKey.y) };
+  if (providerId > 65535n || (publicKey.x === 0n && publicKey.y === 1n)) throw new Error('The demo issuer ID or public key is invalid.');
+  return [providerId, publicKey, [await programBytes(PROGRAM_POLICIES[0][0]), await programBytes(PROGRAM_POLICIES[1][0]), await programBytes(PROGRAM_POLICIES[2][0])]];
+}
+
+// Read-only: new deployments must be ready without administrative follow-up calls.
+export async function verifyDeploymentSetup({ readLedger, issuer, programBytes }) {
+  const [providerId, publicKey, ids] = await deploymentArguments(issuer, programBytes);
+  const state = await readLedger();
+  if (!state.providers.member(providerId) || !same(state.providers.lookup(providerId), publicKey)) throw new Error('This contract does not have the expected issuer. No setup transaction was sent.');
+  for (let index = 0; index < PROGRAM_POLICIES.length; index++) {
+    if (!state.programs.member(ids[index]) || !same(state.programs.lookup(ids[index]), PROGRAM_POLICIES[index][1])) throw new Error('This contract is not preconfigured for the demo programs. No setup transaction was sent.');
+  }
+}
+
 // On-chain state, never the local progress log, decides which calls are needed.
 export async function configureDeployment({ readLedger, callTx, issuer, programBytes, onState, onTransaction }) {
   const providerId = BigInt(issuer.providerId);

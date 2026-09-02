@@ -10,7 +10,7 @@ import { createProofProvider } from '@midnight-ntwrk/midnight-js-types';
 import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } from '@midnight-ntwrk/wallet-sdk-address-format';
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 import { readRecovery, saveRecovery, withDeploymentLock } from './deployment-recovery.js';
-import { configureDeployment } from './deployment-setup.js';
+import { deploymentArguments, verifyDeploymentSetup } from './deployment-setup.js';
 import { lookupDeployment, prepareRetry, submitTracked } from './deployment-status.js';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
@@ -146,6 +146,7 @@ async function deployOrResume(walletId, onState, recovery) {
   const issuerIdentity = JSON.stringify({ providerId: issuer.providerId, publicKey: issuer.publicKey });
   if (record.issuerIdentity && record.issuerIdentity !== issuerIdentity) throw new Error('The demo issuer changed since setup began. Restore the original issuer configuration before resuming.');
   checkpoint({ issuerIdentity });
+  const args = await deploymentArguments(issuer, programBytes);
   const { selected, providers, compiledContract } = await connectWallet(walletId);
   const initialPrivateState = { ...emptyState(), userSecret: recovery.secret };
   const readLedger = async () => {
@@ -170,17 +171,21 @@ async function deployOrResume(walletId, onState, recovery) {
     const submit = providers.midnightProvider.submitTx;
     providers.midnightProvider.submitTx = async (tx) => {
       // Save before broadcast. If confirmation is interrupted, never silently deploy again.
+      const deployments = [...(tx.intents?.values() || [])].flatMap((intent) => intent.actions).filter((action) => action instanceof ledger.ContractDeploy);
+      if (deployments.length !== 1) throw new Error('Expected exactly one contract deployment. Nothing was submitted.');
+      checkpoint({ candidateContractAddress: deployments[0].address, pendingTransactionHash: tx.transactionHash(), deploymentSchema: 'preconfigured-v2' });
       onState('Sending the approved transaction through 1AM; waiting for its submission result.');
       return submitTracked({ submit, tx, identifier: String(tx.identifiers()[0]), checkpoint });
     };
     onState('Approve contract deployment in 1AM. Your encrypted admin backup is saved.');
-    deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState });
+    deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState, args });
     providers.midnightProvider.submitTx = submit;
     contractAddress = String(deployed.deployTxData.public.contractAddress);
     checkpoint({ contractAddress, started: true });
     await onTransaction('deploy', { public: deployed.deployTxData.public });
   }
-  await configureDeployment({ readLedger, callTx: deployed.callTx, issuer, programBytes, onState, onTransaction });
+  onState('Verifying issuer and all three programs created by the deployment. No setup approvals are needed.');
+  await verifyDeploymentSetup({ readLedger, issuer, programBytes });
   checkpoint({ completed: true });
   context = { providers, compiledContract, contractAddress };
   return { contractAddress, network: 'preprod', walletName: selected.name, transactions };

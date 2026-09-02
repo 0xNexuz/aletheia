@@ -28,8 +28,14 @@ export struct PublicClaim {
 export new type UserSecret = Bytes<32>;
 export new type AdminCommitment = Bytes<32>;
 
-constructor() {
+constructor(providerId: Uint<16>, providerPk: JubjubPoint, programIds: Vector<3, Bytes<32>>) {
   contractAdmin = disclose(deriveAdminCommitment(getUserSecret()));
+  assert(programIds[0] != programIds[1] && programIds[0] != programIds[2] && programIds[1] != programIds[2], "Program IDs must be distinct");
+  assert(providerPk.x != 0 || providerPk.y != 1, "Issuer key must not be the identity point");
+  providers.insert(disclose(providerId), disclose(providerPk));
+  programs.insert(disclose(programIds[0]), disclose(ProgramPolicy { minAge: 18, jurisdiction: 566, minHouseholdSize: 2, maxAnnualIncome: 2500000, active: true }));
+  programs.insert(disclose(programIds[1]), disclose(ProgramPolicy { minAge: 18, jurisdiction: 566, minHouseholdSize: 1, maxAnnualIncome: 4000000, active: true }));
+  programs.insert(disclose(programIds[2]), disclose(ProgramPolicy { minAge: 21, jurisdiction: 566, minHouseholdSize: 2, maxAnnualIncome: 3000000, active: true }));
 }
 
 export ledger contractAdmin: AdminCommitment;

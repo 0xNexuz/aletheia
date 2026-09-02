@@ -25,14 +25,15 @@ jobs:
       - name: Compile Compact contract
         run: |
           "$HOME/.local/bin/compact" compile contract/src/aletheia.compact contract/src/managed/aletheia
-      - name: Validate
-        run: |
-          npm run build
-          npm test
-          npm run typecheck
-          npm run lint
       - uses: actions/upload-artifact@v4
         with:
           name: aletheia-compact-artifacts
           path: contract/src/managed/aletheia
           if-no-files-found: error
+      - name: Validate
+        run: |
+          npm run build
+          npm test
+          npm run test:contract
+          npm run typecheck
+          npm run lint

@@ -17,9 +17,10 @@ permissions:
 
 jobs:
   midnight:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 60
     env:
+      ALETHEIA_PREPROD_PROOF_SERVER_URL: https://lace-proof-pub.preprod.midnight.network
       ALETHEIA_PREPROD_WALLET_SEED: ${{ secrets.ALETHEIA_PREPROD_WALLET_SEED }}
     steps:
       - uses: actions/checkout@v4
@@ -40,17 +41,15 @@ jobs:
         run: npm run build:contract
       - name: Show Preprod wallet
         run: npm run midnight:wallet:preprod
-      - name: Start Midnight proof server
+      - name: Check Midnight public proof server
         if: inputs.operation == 'deploy'
         run: |
-          docker run --detach --name midnight-proof-server --publish 6300:6300 midnightntwrk/proof-server:8.1.0 midnight-proof-server -v
           for attempt in {1..60}; do
-            if curl --fail --silent http://127.0.0.1:6300/version; then
+            if curl --fail --silent https://lace-proof-pub.preprod.midnight.network/version; then
               exit 0
             fi
             sleep 2
           done
-          docker logs midnight-proof-server
           exit 1
       - name: Register NIGHT and wait for spendable DUST
         if: inputs.operation == 'deploy'

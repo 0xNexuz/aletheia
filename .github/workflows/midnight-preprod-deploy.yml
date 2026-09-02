@@ -41,16 +41,6 @@ jobs:
         run: npm run build:contract
       - name: Show Preprod wallet
         run: npm run midnight:wallet:preprod
-      - name: Check Midnight public proof server
-        if: inputs.operation == 'deploy'
-        run: |
-          for attempt in {1..60}; do
-            if curl --fail --silent https://lace-proof-pub.preprod.midnight.network/version; then
-              exit 0
-            fi
-            sleep 2
-          done
-          exit 1
       - name: Register NIGHT and wait for spendable DUST
         if: inputs.operation == 'deploy'
         run: npm run midnight:prepare:preprod

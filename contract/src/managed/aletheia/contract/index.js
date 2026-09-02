@@ -286,14 +286,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('claim',
                                      'argument 1 (as invoked from Typescript)',
-                                     'aletheia.compact line 57 char 1',
+                                     'aletheia.compact line 63 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(programId_0.buffer instanceof ArrayBuffer && programId_0.BYTES_PER_ELEMENT === 1 && programId_0.length === 32)) {
           __compactRuntime.typeError('claim',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'aletheia.compact line 57 char 1',
+                                     'aletheia.compact line 63 char 1',
                                      'Bytes<32>',
                                      programId_0)
         }
@@ -321,21 +321,21 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('configureProgram',
                                      'argument 1 (as invoked from Typescript)',
-                                     'aletheia.compact line 93 char 1',
+                                     'aletheia.compact line 99 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(programId_0.buffer instanceof ArrayBuffer && programId_0.BYTES_PER_ELEMENT === 1 && programId_0.length === 32)) {
           __compactRuntime.typeError('configureProgram',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'aletheia.compact line 93 char 1',
+                                     'aletheia.compact line 99 char 1',
                                      'Bytes<32>',
                                      programId_0)
         }
         if (!(typeof(policy_0) === 'object' && typeof(policy_0.minAge) === 'bigint' && policy_0.minAge >= 0n && policy_0.minAge <= 65535n && typeof(policy_0.jurisdiction) === 'bigint' && policy_0.jurisdiction >= 0n && policy_0.jurisdiction <= 65535n && typeof(policy_0.minHouseholdSize) === 'bigint' && policy_0.minHouseholdSize >= 0n && policy_0.minHouseholdSize <= 65535n && typeof(policy_0.maxAnnualIncome) === 'bigint' && policy_0.maxAnnualIncome >= 0n && policy_0.maxAnnualIncome <= 4294967295n && typeof(policy_0.active) === 'boolean')) {
           __compactRuntime.typeError('configureProgram',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'aletheia.compact line 93 char 1',
+                                     'aletheia.compact line 99 char 1',
                                      'struct ProgramPolicy<minAge: Uint<0..65536>, jurisdiction: Uint<0..65536>, minHouseholdSize: Uint<0..65536>, maxAnnualIncome: Uint<0..4294967296>, active: Boolean>',
                                      policy_0)
         }
@@ -366,14 +366,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('registerProvider',
                                      'argument 1 (as invoked from Typescript)',
-                                     'aletheia.compact line 98 char 1',
+                                     'aletheia.compact line 104 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(typeof(providerId_0) === 'bigint' && providerId_0 >= 0n && providerId_0 <= 65535n)) {
           __compactRuntime.typeError('registerProvider',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'aletheia.compact line 98 char 1',
+                                     'aletheia.compact line 104 char 1',
                                      'Uint<0..65536>',
                                      providerId_0)
         }
@@ -404,21 +404,21 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('revokeCredential',
                                      'argument 1 (as invoked from Typescript)',
-                                     'aletheia.compact line 103 char 1',
+                                     'aletheia.compact line 109 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(programId_0.buffer instanceof ArrayBuffer && programId_0.BYTES_PER_ELEMENT === 1 && programId_0.length === 32)) {
           __compactRuntime.typeError('revokeCredential',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'aletheia.compact line 103 char 1',
+                                     'aletheia.compact line 109 char 1',
                                      'Bytes<32>',
                                      programId_0)
         }
         if (!(credentialId_0.buffer instanceof ArrayBuffer && credentialId_0.BYTES_PER_ELEMENT === 1 && credentialId_0.length === 32)) {
           __compactRuntime.typeError('revokeCredential',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'aletheia.compact line 103 char 1',
+                                     'aletheia.compact line 109 char 1',
                                      'Bytes<32>',
                                      credentialId_0)
         }
@@ -448,14 +448,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('rotateAdmin',
                                      'argument 1 (as invoked from Typescript)',
-                                     'aletheia.compact line 109 char 1',
+                                     'aletheia.compact line 115 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(nextAdmin_0.buffer instanceof ArrayBuffer && nextAdmin_0.BYTES_PER_ELEMENT === 1 && nextAdmin_0.length === 32)) {
           __compactRuntime.typeError('rotateAdmin',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'aletheia.compact line 109 char 1',
+                                     'aletheia.compact line 115 char 1',
                                      'Bytes<32>',
                                      nextAdmin_0)
         }
@@ -495,10 +495,13 @@ export class Contract {
     };
   }
   initialState(...args_0) {
-    if (args_0.length !== 1) {
-      throw new __compactRuntime.CompactError(`Contract state constructor: expected 1 argument (as invoked from Typescript), received ${args_0.length}`);
+    if (args_0.length !== 4) {
+      throw new __compactRuntime.CompactError(`Contract state constructor: expected 4 arguments (as invoked from Typescript), received ${args_0.length}`);
     }
     const constructorContext_0 = args_0[0];
+    const providerId_0 = args_0[1];
+    const providerPk_0 = args_0[2];
+    const programIds_0 = args_0[3];
     if (typeof(constructorContext_0) !== 'object') {
       throw new __compactRuntime.CompactError(`Contract state constructor: expected 'constructorContext' in argument 1 (as invoked from Typescript) to be an object`);
     }
@@ -510,6 +513,20 @@ export class Contract {
     }
     if (typeof(constructorContext_0.initialZswapLocalState) !== 'object') {
       throw new __compactRuntime.CompactError(`Contract state constructor: expected 'initialZswapLocalState' in argument 1 (as invoked from Typescript) to be an object`);
+    }
+    if (!(typeof(providerId_0) === 'bigint' && providerId_0 >= 0n && providerId_0 <= 65535n)) {
+      __compactRuntime.typeError('Contract state constructor',
+                                 'argument 1 (argument 2 as invoked from Typescript)',
+                                 'aletheia.compact line 31 char 1',
+                                 'Uint<0..65536>',
+                                 providerId_0)
+    }
+    if (!(Array.isArray(programIds_0) && programIds_0.length === 3 && programIds_0.every((t) => t.buffer instanceof ArrayBuffer && t.BYTES_PER_ELEMENT === 1 && t.length === 32))) {
+      __compactRuntime.typeError('Contract state constructor',
+                                 'argument 3 (argument 4 as invoked from Typescript)',
+                                 'aletheia.compact line 31 char 1',
+                                 'Vector<3, Bytes<32>>',
+                                 programIds_0)
     }
     const state_0 = new __compactRuntime.ContractState();
     let stateValue_0 = __compactRuntime.StateValue.newArray();
@@ -609,6 +626,102 @@ export class Contract {
                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_0),
                                                                                               alignment: _descriptor_0.alignment() }).encode() } },
                                        { ins: { cached: false, n: 1 } }]);
+    __compactRuntime.assert(!this._equal_0(programIds_0[0], programIds_0[1])
+                            &&
+                            !this._equal_1(programIds_0[0], programIds_0[2])
+                            &&
+                            !this._equal_2(programIds_0[1], programIds_0[2]),
+                            'Program IDs must be distinct');
+    __compactRuntime.assert(this._jubjubPointX_0(providerPk_0) !== 0n
+                            ||
+                            this._jubjubPointY_0(providerPk_0) !== 1n,
+                            'Issuer key must not be the identity point');
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_26.toValue(1n),
+                                                                  alignment: _descriptor_26.alignment() } }] } },
+                                       { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_3.toValue(providerId_0),
+                                                                                              alignment: _descriptor_3.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_4.toValue(providerPk_0),
+                                                                                              alignment: _descriptor_4.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } },
+                                       { ins: { cached: true, n: 1 } }]);
+    const tmp_1 = programIds_0[0];
+    const tmp_2 = { minAge: 18n,
+                    jurisdiction: 566n,
+                    minHouseholdSize: 2n,
+                    maxAnnualIncome: 2500000n,
+                    active: true };
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_26.toValue(2n),
+                                                                  alignment: _descriptor_26.alignment() } }] } },
+                                       { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_1),
+                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_7.toValue(tmp_2),
+                                                                                              alignment: _descriptor_7.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } },
+                                       { ins: { cached: true, n: 1 } }]);
+    const tmp_3 = programIds_0[1];
+    const tmp_4 = { minAge: 18n,
+                    jurisdiction: 566n,
+                    minHouseholdSize: 1n,
+                    maxAnnualIncome: 4000000n,
+                    active: true };
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_26.toValue(2n),
+                                                                  alignment: _descriptor_26.alignment() } }] } },
+                                       { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_3),
+                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_7.toValue(tmp_4),
+                                                                                              alignment: _descriptor_7.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } },
+                                       { ins: { cached: true, n: 1 } }]);
+    const tmp_5 = programIds_0[2];
+    const tmp_6 = { minAge: 21n,
+                    jurisdiction: 566n,
+                    minHouseholdSize: 2n,
+                    maxAnnualIncome: 3000000n,
+                    active: true };
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_26.toValue(2n),
+                                                                  alignment: _descriptor_26.alignment() } }] } },
+                                       { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_5),
+                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_7.toValue(tmp_6),
+                                                                                              alignment: _descriptor_7.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } },
+                                       { ins: { cached: true, n: 1 } }]);
     state_0.data = new __compactRuntime.ChargedState(context.currentQueryContext.state.state);
     return {
       currentContractState: state_0,
@@ -731,7 +844,7 @@ export class Contract {
     if (!(Array.isArray(result_0) && result_0.length === 3  && typeof(result_0[0]) === 'object' && typeof(result_0[0].age) === 'bigint' && result_0[0].age >= 0n && result_0[0].age <= 65535n && typeof(result_0[0].jurisdiction) === 'bigint' && result_0[0].jurisdiction >= 0n && result_0[0].jurisdiction <= 65535n && typeof(result_0[0].householdSize) === 'bigint' && result_0[0].householdSize >= 0n && result_0[0].householdSize <= 65535n && typeof(result_0[0].annualIncome) === 'bigint' && result_0[0].annualIncome >= 0n && result_0[0].annualIncome <= 4294967295n && result_0[0].credentialId.buffer instanceof ArrayBuffer && result_0[0].credentialId.BYTES_PER_ELEMENT === 1 && result_0[0].credentialId.length === 32 && typeof(result_0[1]) === 'object' && true && typeof(result_0[1].response) === 'bigint' && result_0[1].response >= 0 && result_0[1].response <= __compactRuntime.MAX_FIELD && typeof(result_0[2]) === 'bigint' && result_0[2] >= 0n && result_0[2] <= 65535n)) {
       __compactRuntime.typeError('getAttestedCredential',
                                  'return value',
-                                 'aletheia.compact line 42 char 1',
+                                 'aletheia.compact line 48 char 1',
                                  '[struct AidCredential<age: Uint<0..65536>, jurisdiction: Uint<0..65536>, householdSize: Uint<0..65536>, annualIncome: Uint<0..4294967296>, credentialId: Bytes<32>>, struct SchnorrSignature<announcement: Opaque<"JubjubPoint">, response: Field>, Uint<0..65536>]',
                                  result_0)
     }
@@ -748,7 +861,7 @@ export class Contract {
     if (!(result_0.buffer instanceof ArrayBuffer && result_0.BYTES_PER_ELEMENT === 1 && result_0.length === 32)) {
       __compactRuntime.typeError('getUserSecret',
                                  'return value',
-                                 'aletheia.compact line 43 char 1',
+                                 'aletheia.compact line 49 char 1',
                                  'Bytes<32>',
                                  result_0)
     }
@@ -886,7 +999,7 @@ export class Contract {
     let t_0;
     __compactRuntime.assert((t_0 = credential_0.age, t_0 >= policy_0.minAge),
                             'Age requirement not satisfied');
-    __compactRuntime.assert(this._equal_0(credential_0.jurisdiction,
+    __compactRuntime.assert(this._equal_3(credential_0.jurisdiction,
                                           policy_0.jurisdiction),
                             'Jurisdiction requirement not satisfied');
     let t_1;
@@ -952,7 +1065,7 @@ export class Contract {
     return [];
   }
   _configureProgram_0(context, partialProofData, programId_0, policy_0) {
-    __compactRuntime.assert(this._equal_1(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
+    __compactRuntime.assert(this._equal_4(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                                     partialProofData,
                                                                                                     [
                                                                                                      { dup: { n: 0 } },
@@ -987,7 +1100,7 @@ export class Contract {
     return [];
   }
   _registerProvider_0(context, partialProofData, providerId_0, providerPk_0) {
-    __compactRuntime.assert(this._equal_2(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
+    __compactRuntime.assert(this._equal_5(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                                     partialProofData,
                                                                                                     [
                                                                                                      { dup: { n: 0 } },
@@ -1022,7 +1135,7 @@ export class Contract {
     return [];
   }
   _revokeCredential_0(context, partialProofData, programId_0, credentialId_0) {
-    __compactRuntime.assert(this._equal_3(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
+    __compactRuntime.assert(this._equal_6(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                                     partialProofData,
                                                                                                     [
                                                                                                      { dup: { n: 0 } },
@@ -1074,7 +1187,7 @@ export class Contract {
     return [];
   }
   _rotateAdmin_0(context, partialProofData, nextAdmin_0) {
-    __compactRuntime.assert(this._equal_4(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
+    __compactRuntime.assert(this._equal_7(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                                     partialProofData,
                                                                                                     [
                                                                                                      { dup: { n: 0 } },
@@ -1105,7 +1218,7 @@ export class Contract {
     return this._schnorrChallenge_0(ann_x_0, ann_y_0, pk_x_0, pk_y_0, msg_0);
   }
   _equal_0(x0, y0) {
-    if (x0 !== y0) { return false; }
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
     return true;
   }
   _equal_1(x0, y0) {
@@ -1117,10 +1230,22 @@ export class Contract {
     return true;
   }
   _equal_3(x0, y0) {
-    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    if (x0 !== y0) { return false; }
     return true;
   }
   _equal_4(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_5(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_6(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_7(x0, y0) {
     if (!x0.every((x, i) => y0[i] === x)) { return false; }
     return true;
   }
@@ -1202,7 +1327,7 @@ export function ledger(stateOrChargedState) {
         if (!(typeof(key_0) === 'bigint' && key_0 >= 0n && key_0 <= 65535n)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'aletheia.compact line 36 char 1',
+                                     'aletheia.compact line 42 char 1',
                                      'Uint<0..65536>',
                                      key_0)
         }
@@ -1231,7 +1356,7 @@ export function ledger(stateOrChargedState) {
         if (!(typeof(key_0) === 'bigint' && key_0 >= 0n && key_0 <= 65535n)) {
           __compactRuntime.typeError('lookup',
                                      'argument 1',
-                                     'aletheia.compact line 36 char 1',
+                                     'aletheia.compact line 42 char 1',
                                      'Uint<0..65536>',
                                      key_0)
         }
@@ -1311,7 +1436,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'aletheia.compact line 37 char 1',
+                                     'aletheia.compact line 43 char 1',
                                      'Bytes<32>',
                                      key_0)
         }
@@ -1340,7 +1465,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('lookup',
                                      'argument 1',
-                                     'aletheia.compact line 37 char 1',
+                                     'aletheia.compact line 43 char 1',
                                      'Bytes<32>',
                                      key_0)
         }
@@ -1420,7 +1545,7 @@ export function ledger(stateOrChargedState) {
         if (!(elem_0.buffer instanceof ArrayBuffer && elem_0.BYTES_PER_ELEMENT === 1 && elem_0.length === 32)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'aletheia.compact line 38 char 1',
+                                     'aletheia.compact line 44 char 1',
                                      'Bytes<32>',
                                      elem_0)
         }
@@ -1498,7 +1623,7 @@ export function ledger(stateOrChargedState) {
         if (!(elem_0.buffer instanceof ArrayBuffer && elem_0.BYTES_PER_ELEMENT === 1 && elem_0.length === 32)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'aletheia.compact line 39 char 1',
+                                     'aletheia.compact line 45 char 1',
                                      'Bytes<32>',
                                      elem_0)
         }
@@ -1576,7 +1701,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'aletheia.compact line 40 char 1',
+                                     'aletheia.compact line 46 char 1',
                                      'Bytes<32>',
                                      key_0)
         }
@@ -1605,7 +1730,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('lookup',
                                      'argument 1',
-                                     'aletheia.compact line 40 char 1',
+                                     'aletheia.compact line 46 char 1',
                                      'Bytes<32>',
                                      key_0)
         }
@@ -1655,7 +1780,7 @@ export const pureCircuits = {
     if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
       __compactRuntime.typeError('deriveAdminCommitment',
                                  'argument 1',
-                                 'aletheia.compact line 45 char 1',
+                                 'aletheia.compact line 51 char 1',
                                  'Bytes<32>',
                                  secret_0)
     }
@@ -1670,14 +1795,14 @@ export const pureCircuits = {
     if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
       __compactRuntime.typeError('deriveProgramNullifier',
                                  'argument 1',
-                                 'aletheia.compact line 49 char 1',
+                                 'aletheia.compact line 55 char 1',
                                  'Bytes<32>',
                                  secret_0)
     }
     if (!(programId_0.buffer instanceof ArrayBuffer && programId_0.BYTES_PER_ELEMENT === 1 && programId_0.length === 32)) {
       __compactRuntime.typeError('deriveProgramNullifier',
                                  'argument 2',
-                                 'aletheia.compact line 49 char 1',
+                                 'aletheia.compact line 55 char 1',
                                  'Bytes<32>',
                                  programId_0)
     }
@@ -1692,14 +1817,14 @@ export const pureCircuits = {
     if (!(credentialId_0.buffer instanceof ArrayBuffer && credentialId_0.BYTES_PER_ELEMENT === 1 && credentialId_0.length === 32)) {
       __compactRuntime.typeError('credentialRevocationHandle',
                                  'argument 1',
-                                 'aletheia.compact line 53 char 1',
+                                 'aletheia.compact line 59 char 1',
                                  'Bytes<32>',
                                  credentialId_0)
     }
     if (!(programId_0.buffer instanceof ArrayBuffer && programId_0.BYTES_PER_ELEMENT === 1 && programId_0.length === 32)) {
       __compactRuntime.typeError('credentialRevocationHandle',
                                  'argument 2',
-                                 'aletheia.compact line 53 char 1',
+                                 'aletheia.compact line 59 char 1',
                                  'Bytes<32>',
                                  programId_0)
     }
@@ -1718,35 +1843,35 @@ export const pureCircuits = {
     if (!(typeof(ann_x_0) === 'bigint' && ann_x_0 >= 0 && ann_x_0 <= __compactRuntime.MAX_FIELD)) {
       __compactRuntime.typeError('schnorrChallenge',
                                  'argument 1',
-                                 'aletheia.compact line 114 char 1',
+                                 'aletheia.compact line 120 char 1',
                                  'Field',
                                  ann_x_0)
     }
     if (!(typeof(ann_y_0) === 'bigint' && ann_y_0 >= 0 && ann_y_0 <= __compactRuntime.MAX_FIELD)) {
       __compactRuntime.typeError('schnorrChallenge',
                                  'argument 2',
-                                 'aletheia.compact line 114 char 1',
+                                 'aletheia.compact line 120 char 1',
                                  'Field',
                                  ann_y_0)
     }
     if (!(typeof(pk_x_0) === 'bigint' && pk_x_0 >= 0 && pk_x_0 <= __compactRuntime.MAX_FIELD)) {
       __compactRuntime.typeError('schnorrChallenge',
                                  'argument 3',
-                                 'aletheia.compact line 114 char 1',
+                                 'aletheia.compact line 120 char 1',
                                  'Field',
                                  pk_x_0)
     }
     if (!(typeof(pk_y_0) === 'bigint' && pk_y_0 >= 0 && pk_y_0 <= __compactRuntime.MAX_FIELD)) {
       __compactRuntime.typeError('schnorrChallenge',
                                  'argument 4',
-                                 'aletheia.compact line 114 char 1',
+                                 'aletheia.compact line 120 char 1',
                                  'Field',
                                  pk_y_0)
     }
     if (!(Array.isArray(msg_0) && msg_0.length === 6 && msg_0.every((t) => typeof(t) === 'bigint' && t >= 0 && t <= __compactRuntime.MAX_FIELD))) {
       __compactRuntime.typeError('schnorrChallenge',
                                  'argument 5',
-                                 'aletheia.compact line 114 char 1',
+                                 'aletheia.compact line 120 char 1',
                                  'Vector<6, Field>',
                                  msg_0)
     }

@@ -11,7 +11,8 @@ import { MidnightBech32m, ShieldedCoinPublicKey, ShieldedEncryptionPublicKey } f
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 import { readRecovery, saveRecovery, withDeploymentLock } from './deployment-recovery.js';
 import { deploymentArguments, verifyDeploymentSetup } from './deployment-setup.js';
-import { lookupDeployment, prepareRetry, submitTracked } from './deployment-status.js';
+import { PREPROD_INDEXER, lookupDeployment, prepareRetry, submitTracked } from './deployment-status.js';
+import { assertClaimRecord, lookupLiveClaim, verifyClaimLedger } from './live-claim-status.js';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
 let context;
@@ -59,7 +60,7 @@ function privateStateProvider() {
   };
 }
 
-async function connectWallet(walletId) {
+async function connectWallet(walletId, onState = () => {}) {
   const available = discoverCompactWallets();
   const selected = available.find((item) => item.id === walletId) || (available.length === 1 ? available[0] : null);
   if (!selected) throw new Error(available.length ? 'Choose a compatible Midnight wallet first.' : 'No compatible Midnight wallet was detected. Install or enable a wallet implementing Connector API v4 and refresh.');
@@ -86,6 +87,7 @@ async function connectWallet(walletId) {
       getCoinPublicKey: () => coinPublicKey,
       getEncryptionPublicKey: () => encryptionPublicKey,
       async balanceTx(tx) {
+        onState('Proof ready. Open 1AM to review and approve the Preprod transaction.');
         const result = await wallet.balanceUnsealedTransaction(hex(tx.serialize()), {});
         return ledger.Transaction.deserialize('signature', 'proof', 'binding', bytes(result.tx));
       }
@@ -147,7 +149,7 @@ async function deployOrResume(walletId, onState, recovery) {
   if (record.issuerIdentity && record.issuerIdentity !== issuerIdentity) throw new Error('The demo issuer changed since setup began. Restore the original issuer configuration before resuming.');
   checkpoint({ issuerIdentity });
   const args = await deploymentArguments(issuer, programBytes);
-  const { selected, providers, compiledContract } = await connectWallet(walletId);
+  const { selected, providers, compiledContract } = await connectWallet(walletId, onState);
   const initialPrivateState = { ...emptyState(), userSecret: recovery.secret };
   const readLedger = async () => {
     const state = await providers.publicDataProvider.queryContractState(contractAddress);
@@ -175,7 +177,9 @@ async function deployOrResume(walletId, onState, recovery) {
       if (deployments.length !== 1) throw new Error('Expected exactly one contract deployment. Nothing was submitted.');
       checkpoint({ candidateContractAddress: deployments[0].address, pendingTransactionHash: tx.transactionHash(), deploymentSchema: 'preconfigured-v2' });
       onState('Sending the approved transaction through 1AM; waiting for its submission result.');
-      return submitTracked({ submit, tx, identifier: String(tx.identifiers()[0]), checkpoint });
+      const result = await submitTracked({ submit, tx, identifier: String(tx.identifiers()[0]), checkpoint });
+      onState('1AM accepted the submission. Waiting for Preprod confirmation; this is not confirmed yet.');
+      return result;
     };
     onState('Approve contract deployment in 1AM. Your encrypted admin backup is saved.');
     deployed = await deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState, args });
@@ -225,4 +229,57 @@ export async function submitPreparedCompactClaim(prepared, onState = () => {}) {
   onState('Generating zero-knowledge proof');
   const tx = await submitCallTx(context.providers, { compiledContract: context.compiledContract, contractAddress: context.contractAddress, circuitId: 'claim', args: [prepared.programBytes], privateStateId: PRIVATE_STATE_ID });
   return { nullifier: prepared.nullifier, txHash: String(tx.public.txId), blockReference: String(tx.public.blockHeight), contractAddress: context.contractAddress };
+}
+
+// This read-only check also works after the original claim tab has closed.
+export async function checkDeploymentDemoClaim() {
+  const record = readRecovery(window.localStorage);
+  const claim = record?.liveClaim;
+  assertClaimRecord(claim, record?.contractAddress);
+  const observed = await lookupLiveClaim(claim);
+  if (observed.status !== 'transaction-confirmed') return observed;
+  const reader = indexerPublicDataProvider(PREPROD_INDEXER, 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws');
+  const state = await reader.queryContractState(record.contractAddress);
+  if (!state) throw new Error('The claimed contract is not indexed yet.');
+  verifyClaimLedger(Aletheia.ledger(state.data), bytes(claim.nullifier), await programBytes(claim.programId));
+  const current = readRecovery(window.localStorage);
+  if (current?.liveClaim?.pendingTransactionId !== claim.pendingTransactionId || current?.contractAddress !== record.contractAddress) throw new Error('The saved claim changed during verification. Check again.');
+  const confirmed = { ...claim, ...observed, status: 'confirmed' };
+  saveRecovery(window.localStorage, { ...current, liveClaim: confirmed });
+  return confirmed;
+}
+
+export async function submitDeploymentDemoClaim(walletId, onState = () => {}) {
+  return withDeploymentLock(navigator.locks, async () => {
+    const record = readRecovery(window.localStorage);
+    if (!record?.completed || !/^[a-f0-9]{64}$/.test(record.contractAddress || '')) throw new Error('Verify the preconfigured deployment first.');
+    if (record.liveClaim?.pendingTransactionId) throw new Error('A live claim is already saved. Use Check live claim; no second claim was sent.');
+    const { providers, compiledContract } = await connectWallet(walletId, onState);
+    const issuerResponse = await fetch('/api/credentials', { cache: 'no-store' });
+    const issuer = await issuerResponse.json();
+    if (!issuerResponse.ok) throw new Error('The demo issuer is unavailable. No claim was submitted.');
+    await verifyDeploymentSetup({ issuer, programBytes, readLedger: async () => {
+      const state = await providers.publicDataProvider.queryContractState(record.contractAddress);
+      if (!state) throw new Error('The deployed contract is not indexed.');
+      return Aletheia.ledger(state.data);
+    } });
+    await findDeployedContract(providers, { contractAddress: record.contractAddress, compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: emptyState() });
+    context = { providers, compiledContract, contractAddress: record.contractAddress };
+    const prepared = await prepareCompactClaim('food-support-2026', onState);
+    const submit = providers.midnightProvider.submitTx;
+    providers.midnightProvider.submitTx = async (tx) => {
+      const checkpoint = (changes) => {
+        const current = readRecovery(window.localStorage);
+        if (current?.vault.ciphertext !== record.vault.ciphertext || current.contractAddress !== record.contractAddress) throw new Error('Deployment recovery changed; submission stopped.');
+        saveRecovery(window.localStorage, { ...current, liveClaim: { ...current.liveClaim, contractAddress: record.contractAddress, programId: prepared.programId, nullifier: prepared.nullifier, pendingTransactionHash: tx.transactionHash(), ...changes } });
+      };
+      onState('Sending your approved live claim through 1AM.');
+      const id = await submitTracked({ submit, tx, identifier: String(tx.identifiers()[0]), checkpoint });
+      onState('1AM accepted the claim submission. Waiting for Preprod confirmation.');
+      return id;
+    };
+    try { await submitPreparedCompactClaim(prepared, onState); }
+    finally { providers.midnightProvider.submitTx = submit; }
+    return checkDeploymentDemoClaim();
+  });
 }

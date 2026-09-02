@@ -41,13 +41,17 @@ test('storage failure prevents wallet broadcast', async () => {
 });
 
 test('approved retry preserves the exact encrypted vault and archives the old ID without mutating it', () => {
-  const record = { vault: { ciphertext: 'encrypted-test-value' }, started: true, pendingTransactionId: id, transactions: [], issuerIdentity: 'same-issuer' };
+  const record = { vault: { ciphertext: 'encrypted-test-value' }, started: true, pendingTransactionId: id, candidateContractAddress: '12'.repeat(32), pendingTransactionHash: '34'.repeat(32), transactions: [], issuerIdentity: 'same-issuer' };
   const next = prepareRetry(record, { status: 'unconfirmed', identifier: id }, true);
   assert.equal(next.vault, record.vault);
   assert.equal(next.issuerIdentity, record.issuerIdentity);
   assert.equal(record.pendingTransactionId, id);
   assert.equal(record.started, true);
   assert.equal(next.previousAttempts[0].pendingTransactionId, id);
+  assert.equal(next.previousAttempts[0].candidateContractAddress, record.candidateContractAddress);
+  assert.equal(next.previousAttempts[0].pendingTransactionHash, record.pendingTransactionHash);
+  assert.equal(next.candidateContractAddress, '');
+  assert.equal(next.pendingTransactionHash, '');
   assert.equal(next.started, false);
 });
 test('retry refuses absent consent, mismatched IDs, confirmed results and configured contracts', () => {

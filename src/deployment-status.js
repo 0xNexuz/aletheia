@@ -41,9 +41,10 @@ export function prepareRetry(record, observation, approved) {
   if (approved !== true) throw new Error('A fresh attempt needs your explicit approval because the old attempt could still land.');
   if (!record?.started || !record.pendingTransactionId || record.contractAddress || record.completed || record.transactions?.length) throw new Error('This recovery is not an unconfirmed deployment. Resume its existing contract instead.');
   if (observation?.status !== 'unconfirmed' || observation.identifier !== record.pendingTransactionId) throw new Error('Only the exact unconfirmed attempt can be retried. Recovery was not changed.');
-  return { ...record, started: false, completed: false, pendingTransactionId: '', submissionStatus: 'retry-authorized', lastSubmissionError: '',
+  return { ...record, started: false, completed: false, pendingTransactionId: '', candidateContractAddress: '', pendingTransactionHash: '', submissionStatus: 'retry-authorized', lastSubmissionError: '',
     previousAttempts: [...(record.previousAttempts || []), {
       pendingTransactionId: record.pendingTransactionId, submissionStatus: record.submissionStatus || 'legacy-result-not-recorded',
+      candidateContractAddress: record.candidateContractAddress || '', pendingTransactionHash: record.pendingTransactionHash || '',
       lastSubmissionError: record.lastSubmissionError || '', archivedAt: new Date().toISOString()
     }]
   };

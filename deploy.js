@@ -1,5 +1,5 @@
 import './src/browser-polyfills.js';
-import { deployCompact, discoverCompactWallets, retryCompact } from './src/midnight-client.js';
+import { deployCompact, discoverCompactWallets, retryCompact, submitDeploymentDemoClaim, checkDeploymentDemoClaim } from './src/midnight-client.js';
 import { createRecovery, importRecovery, readRecovery, unlockRecovery, withDeploymentLock } from './src/deployment-recovery.js';
 import { lookupDeployment } from './src/deployment-status.js';
 
@@ -10,6 +10,8 @@ const status = byId('status');
 const evidence = byId('evidence');
 let recovery;
 let busy = false;
+let checking = false;
+const updateStatus = (message) => { status.textContent = message; render(); };
 
 function render() {
   let record;
@@ -20,7 +22,9 @@ function render() {
   byId('prepare-recovery').disabled = busy;
   byId('import-recovery').disabled = busy;
   byId('refresh-wallets').disabled = busy;
-  byId('check-submission').disabled = busy || !record?.pendingTransactionId;
+  byId('check-submission').disabled = checking || !record?.pendingTransactionId;
+  byId('live-claim').disabled = busy || !record?.completed || !walletSelect.value || !!record?.liveClaim?.pendingTransactionId;
+  byId('check-live-claim').disabled = checking || !record?.liveClaim?.pendingTransactionId;
   byId('retry-panel').hidden = !record?.started || !!record?.contractAddress || record?.completed === true;
   byId('retry-approved').disabled = busy;
   byId('retry-deployment').disabled = busy || !recovery || !byId('backup-confirmed').checked || !byId('retry-approved').checked || !walletSelect.value;
@@ -31,8 +35,13 @@ function render() {
   deployButton.textContent = record?.started || byId('contract-address').value.trim() ? 'Connect 1AM & resume setup' : 'Connect 1AM & deploy safely';
   if (record) {
     if (!byId('contract-address').value) byId('contract-address').value = record.contractAddress || '';
-    evidence.textContent = JSON.stringify({ network: record.network, contractAddress: record.contractAddress, pendingTransactionId: record.pendingTransactionId, submissionStatus: record.submissionStatus || (record.started ? 'legacy-result-not-recorded' : 'not-started'), lastSubmissionError: record.lastSubmissionError, previousAttempts: record.previousAttempts, configured: record.completed === true, transactions: record.transactions }, null, 2);
+    evidence.textContent = JSON.stringify({ network: record.network, contractAddress: record.contractAddress, candidateContractAddress: record.candidateContractAddress, pendingTransactionId: record.pendingTransactionId, pendingTransactionHash: record.pendingTransactionHash, submissionStatus: record.submissionStatus || (record.started ? 'legacy-result-not-recorded' : 'not-started'), lastSubmissionError: record.lastSubmissionError, previousAttempts: record.previousAttempts, configured: record.completed === true, transactions: record.transactions }, null, 2);
     evidence.hidden = false;
+    byId('claim-evidence').hidden = !record.liveClaim;
+    if (record.liveClaim) {
+      const claim = record.liveClaim;
+      byId('claim-evidence').textContent = JSON.stringify({ network: 'preprod', contractAddress: claim.contractAddress, programId: claim.programId, nullifier: claim.nullifier, pendingTransactionId: claim.pendingTransactionId, pendingTransactionHash: claim.pendingTransactionHash, transactionHash: claim.transactionHash, blockHeight: claim.blockHeight, status: claim.status || claim.submissionStatus, lastSubmissionError: claim.lastSubmissionError }, null, 2);
+    }
   }
 }
 
@@ -94,7 +103,14 @@ byId('download-recovery').addEventListener('click', () => {
 });
 
 byId('refresh-wallets').addEventListener('click', refreshWallets);
-byId('check-submission').addEventListener('click', () => run(async () => {
+async function check(action, target = status) {
+  if (checking) return;
+  checking = true; render();
+  try { await action(); }
+  catch (error) { target.textContent = error?.message || 'Check unavailable. Saved evidence was kept.'; }
+  finally { checking = false; render(); }
+}
+byId('check-submission').addEventListener('click', () => check(async () => {
   const record = readRecovery(window.localStorage);
   status.textContent = 'Checking the official Preprod indexer. This does not submit a transaction.';
   const result = await lookupDeployment(record?.pendingTransactionId);
@@ -113,16 +129,27 @@ byId('contract-address').addEventListener('input', render);
 walletSelect.addEventListener('change', render);
 window.addEventListener('focus', refreshWallets);
 deployButton.addEventListener('click', () => run(async () => {
-  const result = await deployCompact(walletSelect.value, (message) => { status.textContent = message; }, {
+  const result = await deployCompact(walletSelect.value, updateStatus, {
     ...recovery, contractAddress: byId('contract-address').value, backupConfirmed: byId('backup-confirmed').checked
   });
-  status.textContent = `${result.walletName}: deployment and all four setup steps verified on Preprod. A real claim still remains.`;
+  status.textContent = `${result.walletName}: deployment, issuer and three programs verified on Preprod. Use Submit live demo claim below.`;
 }, false));
 byId('retry-deployment').addEventListener('click', () => run(async () => {
-  const result = await retryCompact(walletSelect.value, (message) => { status.textContent = message; }, {
+  const result = await retryCompact(walletSelect.value, updateStatus, {
     ...recovery, backupConfirmed: byId('backup-confirmed').checked, retryApproved: byId('retry-approved').checked
   });
   status.textContent = `${result.walletName}: deployment and setup verified on Preprod. Save an updated recovery backup. A real claim still remains.`;
 }, false));
+byId('live-claim').addEventListener('click', () => run(async () => {
+  const target = byId('claim-status');
+  try {
+    const result = await submitDeploymentDemoClaim(walletSelect.value, (message) => { target.textContent = message; render(); });
+    target.textContent = result.status === 'confirmed' ? `Live claim confirmed in Preprod block ${result.blockHeight}. Public evidence is below.` : 'Claim submitted but not yet independently verified. Use Check live claim; do not submit another.';
+  } catch (error) { target.textContent = error?.message || 'Claim paused. Check saved evidence before retrying.'; }
+}, false));
+byId('check-live-claim').addEventListener('click', () => check(async () => {
+  const result = await checkDeploymentDemoClaim();
+  byId('claim-status').textContent = result.status === 'confirmed' ? `Live claim confirmed in Preprod block ${result.blockHeight}.` : `Claim is ${result.status}. No new transaction was sent.`;
+}, byId('claim-status')));
 render();
 setTimeout(refreshWallets, 250);

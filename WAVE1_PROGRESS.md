@@ -21,6 +21,7 @@ The public repository already demonstrated the product idea, a Compact contract 
 - Deployed Aletheia to Midnight Preprod and independently verified the indexed `ContractDeploy` transaction, contract address, and block.
 - Replaced the legacy memory-only browser admin key with encrypted device-local recovery and a downloadable backup. Setup can resume after closing the tab and checks on-chain state before requesting remaining approvals.
 - Added read-only pending-transaction reconciliation, durable wallet-submission status, redacted failure details, and an explicit-consent retry path that retains the same encrypted key and archives previous IDs. The application suite now has 43 passing tests; this is local verification, not proof of a replacement deployment.
+- Simplified new deployments to initialize the demo issuer and all three programs in the constructor, eliminating four separate setup transactions. Added a standalone live-claim control with persistent public evidence and read-only checks against the official indexer and contract state. Pending claims cannot silently be resubmitted.
 
 ## Validation evidence
 
@@ -34,7 +35,7 @@ npm run lint
 npm audit --omit=dev
 ```
 
-The recovery patch passes the production build, 35 application tests, 2 compiled Compact admin-circuit tests, typecheck, and lint. HTTP checks confirm the local deployment page, all nine claim/setup proof files, and the production-matching public issuer configuration are available. These checks do not claim a replacement deployment or a successful claim transaction. The production dependency audit passed for the earlier hardened baseline; no new dependencies were added for recovery.
+The current patch passes the production build, 49 application/SDK tests, 7 compiled Compact tests, typecheck, and lint. The compiled tests cover immediate eligible claims, duplicate rejection, cross-program claims, invalid signatures, copied credentials, and ineligible credentials. An offline SDK test assembles exactly one deployment using real verifier assets. The browser-facing provider loads all 15 verifier/prover/ZKIR files from localhost. These checks do not claim a replacement deployment or a successful claim transaction. The production dependency audit passed for the earlier hardened baseline; no new dependencies were added for this work. Local claim signing still requires an available credential issuer; public-key-only deployment configuration cannot sign credentials.
 
 ## Current state
 
@@ -42,7 +43,7 @@ The Compact contract and Midnight client integration are implemented. The legacy
 
 ## Next Wave
 
-- Deploy a replacement with encrypted admin recovery, then complete issuer and program configuration.
+- Deploy a replacement with encrypted admin recovery and constructor-initialized issuer/programs.
 - Demonstrate successful claim, same-program duplicate rejection, and cross-program unlinkability on chain.
 - Add accountable issuer governance and an appeals workflow.
 - Run a small field pilot with an aid-program operator.

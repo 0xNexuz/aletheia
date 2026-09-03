@@ -43,3 +43,17 @@ test('wallet readiness remains fail-closed across funding states', () => {
   assert.equal(classifyWalletReadiness({ isSynced: true, unshielded: { availableCoins: [{ meta: {} }], balances: { night: 1n } }, dust: { availableCoins: [], pendingCoins: [] } }), 'NIGHT_NOT_REGISTERED_FOR_DUST');
   assert.equal(classifyWalletReadiness({ isSynced: true, unshielded: { availableCoins: [{ meta: { registeredForDustGeneration: true } }], balances: { night: 1n } }, dust: { availableCoins: [{}], pendingCoins: [] } }), 'DUST_READY');
 });
+
+test('browser uses one compatible Midnight on-chain runtime', async () => {
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  const packageLock = JSON.parse(await readFile(new URL('../package-lock.json', import.meta.url), 'utf8'));
+  const versions = new Set(
+    Object.entries(packageLock.packages)
+      .filter(([name]) => name.endsWith('/@midnight-ntwrk/onchain-runtime-v3'))
+      .map(([, metadata]) => metadata.version),
+  );
+
+  assert.equal(packageJson.dependencies['@midnight-ntwrk/onchain-runtime-v3'], '3.0.0');
+  assert.equal(packageJson.overrides['@midnight-ntwrk/onchain-runtime-v3'], '3.0.0');
+  assert.deepEqual([...versions], ['3.0.0']);
+});

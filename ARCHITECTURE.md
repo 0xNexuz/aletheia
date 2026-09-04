@@ -21,4 +21,6 @@ sequenceDiagram
   O-->>C: Signed allocation receipt
 ```
 
-Midnight owns policy proof, issuer authorization, revocation, and one-use program nullifiers. D1 owns capacities, reservations, redemption/reconciliation metadata, aggregate statistics, inquiries, and receipts. Program IDs are SHA-256 encoded to Compact `Bytes<32>`.
+Midnight owns policy proof, issuer authorization, revocation, and one-use nullifiers per claimant secret/program. D1 owns capacities, reservations, redemption/reconciliation metadata, aggregate statistics, inquiries, and receipts. The Compact contract does not enforce inventory caps. The recorded standalone Preprod claim bypasses the operational reservation flow, so its confirmation is not evidence of backend allocation finalization. Program IDs are SHA-256 encoded to Compact `Bytes<32>`.
+
+The wallet-selected proof provider is a separate trust boundary: a remote prover may receive private witnesses. The open demo issuer accepts new commitments and does not establish one unique real-world person per claimant secret. These are test credentials, not verified beneficiary eligibility.

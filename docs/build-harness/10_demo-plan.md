@@ -10,7 +10,7 @@ In 60 seconds, prove that an aid applicant can submit an issuer-backed, one-use 
 2. **Private setup — 10–20s:** select Food Support and show which fields stay private.
 3. **Real action — 20–40s:** select Midnight Compact, connect 1AM, generate proof, and approve the Preprod call.
 4. **Evidence — 40–50s:** show contract, transaction, block, program, nullifier, and zero private fields published.
-5. **Failure property — 50–56s:** retry Food Support and show duplicate rejection; if live infrastructure is slow, show a clearly identified capture of a real rejection once available.
+5. **Failure property — 50–56s:** show the compiled same-secret duplicate-rejection test and label it as a test. Public rejection evidence remains pending.
 6. **Close — 56–60s:** explain that another program derives a different nullifier.
 
 ## Environment
@@ -31,4 +31,4 @@ In 60 seconds, prove that an aid applicant can submit an issuer-backed, one-use 
 
 ## Status
 
-Script: **COMPLETE**. Final recorded/uploaded video URL: **P0 — UNVERIFIED**.
+Walkthrough wording corrected for evidence accuracy. Final video URL: **P0 — UNVERIFIED**, owner-provided. Video creation and upload are outside the 2026-09-05 correction pass. The standalone claim does not finalize backend inventory, and scoped nullifiers do not guarantee complete anonymity or uniqueness of real-world people.

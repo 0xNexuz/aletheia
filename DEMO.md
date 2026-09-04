@@ -4,9 +4,9 @@ Use operational Preprod contract `7e4e3c18a2a139711f17085aef0aa66c953fa901900ab6
 
 - **0–10s:** “Aletheia prevents duplicate humanitarian allocations without a public beneficiary identity database.”
 - **10–22s:** Select Emergency Food Support. Point out that age, income, household, jurisdiction, credential ID, and wallet secret remain private.
-- **22–38s:** Choose Midnight Compact and select a compatible wallet. Show signed credential, proof generation, wallet approval, Preprod submission, nullifier verification, and inventory finalization.
-- **38–48s:** Expand Technical evidence: program, proof mode, nullifier, contract, transaction, block, and zero private fields sent.
-- **48–55s:** Retry the program. Show “Program nullifier already used” and duplicate rejection.
-- **55–60s:** Select Medical Assistance and explain its intentionally unlinkable nullifier. CTA: try the claim lab and send a private program-design inquiry.
+- **22–38s:** Show the existing confirmed Food Support claim or genuine recorded 1AM approval. Label a prior confirmation as recorded evidence. The standalone claim does not finalize backend inventory.
+- **38–48s:** Inspect public evidence: program, nullifier, contract, transaction and block. Raw eligibility values are not published on chain; a remote prover may receive private witnesses.
+- **48–55s:** Show the compiled duplicate-rejection test, explicitly labeled as a test. A public rejection capture remains pending.
+- **55–60s:** Explain that the same secret derives a different nullifier for another program, as covered by compiled tests. This does not establish complete anonymity or one unique person per secret.
 
 If the contract is not configured, use the explicitly labeled simulation and say so. Never show a simulated hash as a Midnight transaction.

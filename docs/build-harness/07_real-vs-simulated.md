@@ -31,4 +31,6 @@
 - README: updated to `REAL — TESTNET` for the claim and operational contract.
 - Submission: updated with exact public evidence.
 - UI: distinguishes Midnight Compact from simulation.
-- Remaining contradiction: `/api/health` currently reflects the backend's missing contract configuration, while the production browser uses the validated bundled public address. This is a P1 observability issue, not a claim-execution blocker.
+- Health bridge now publishes the validated hosted `contractAddress` with Preprod configuration metadata. Backend failure remains a failure; this is not independent chain or prover verification.
+- Compact does not enforce inventory limits. Backend allocation completion is not established by the captured standalone transaction.
+- Duplicate rejection is for a fixed secret/program. The demo issuer does not enforce uniqueness of real-world people.

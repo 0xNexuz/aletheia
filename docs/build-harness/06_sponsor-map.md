@@ -31,4 +31,4 @@ Inspect `evidence/claim-preprod-food-support.json`, then query its transaction i
 ## Missing Sponsor Requirements
 
 - Exact official track/category and any sponsor-specific form fields are **UNVERIFIED**.
-- The repository topic `midnightntwrk` should be confirmed on GitHub.
+- Public repository topic `midnightntwrk` and Apache-2.0 license verified through GitHub on 2026-09-04.

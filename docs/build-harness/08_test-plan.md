@@ -8,7 +8,7 @@ Prove that credentials cannot be forged, private inputs are not exposed, same-pr
 
 | Area | Evidence | Status |
 |---|---|---|
-| Unit/integration application tests | `tests/*.test.mjs` — 53 passing | VERIFIED |
+| Unit/integration application tests | `tests/*.test.mjs` — 57 passing | VERIFIED |
 | Compiled Compact tests | `contract` — 7 passing | VERIFIED |
 | Typecheck | Root and contract TypeScript | VERIFIED |
 | Lint | App, API, library, tests, scripts | VERIFIED |
@@ -29,6 +29,7 @@ Prove that credentials cannot be forged, private inputs are not exposed, same-pr
 - Unauthorized credential relay destination.
 - Sensitive evidence redaction.
 - Duplicate browser runtime regression.
+- Hosted health configuration, invalid/missing addresses, upstream failures, secret exclusion and method restrictions.
 
 ## Commands
 

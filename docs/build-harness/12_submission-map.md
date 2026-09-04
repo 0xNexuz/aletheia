@@ -12,7 +12,7 @@
 
 | Requirement | Status | Evidence / action |
 |---|---|---|
-| Public repository | PARTIAL | URL recorded; visibility must be checked after push |
+| Public repository | COMPLETE | Public repository and branch verified through GitHub |
 | Apache-2.0 license | COMPLETE | `LICENSE`, package metadata |
 | Midnight-related work developed/materially extended | COMPLETE | `WAVE1_PROGRESS.md` |
 | Live app | COMPLETE | https://alethia-pi.vercel.app |
@@ -22,9 +22,10 @@
 | Claim evidence | COMPLETE | Confirmed claim evidence JSON |
 | Slide deck | COMPLETE | `submission/Aletheia_Midnight_Buildathon_Wave1.pptx` |
 | Demo video URL | P0 — UNVERIFIED | Record/upload and add URL |
-| Repository push | P0 — UNVERIFIED | Push current verified commits to `0xNexuz/aletheia` |
+| Repository push | COMPLETE | Branch `codex/adopt-preprod-contract` at `afa0019`; CI and security checks pass |
+| Merge to default branch | P0 — UNVERIFIED | PR #17 is open as a draft and requires owner approval to merge |
 | AKINDO form submission | P0 — UNVERIFIED | Complete and capture confirmation |
-| GitHub topic `midnightntwrk` | P1 — UNVERIFIED | Confirm repository topic |
+| GitHub topic `midnightntwrk` | COMPLETE | Confirmed on the public repository |
 
 ## Links
 
@@ -45,7 +46,7 @@
 
 ## P0
 
-- Push the verified branch and confirm repository visibility.
+- Merge PR #17 to the default branch after owner approval.
 - Record/upload the demo video and add the final URL.
 - Confirm the official deadline/timezone and submit through AKINDO.
 
@@ -54,10 +55,9 @@
 - Capture one same-program duplicate rejection on Preprod.
 - Capture one second-program claim demonstrating a different nullifier.
 - Make backend health advertise the current contract address.
-- Confirm the `midnightntwrk` GitHub topic.
 
 ## Gate
 
 - Core Midnight mechanism: **READY**.
 - Overall submission: **NOT READY** until the P0 packaging items are verified.
-- Conservative readiness score: **86/100**.
+- Conservative readiness score: **88/100**.

@@ -5,8 +5,9 @@
 - Name: Midnight Buildathon.
 - Wave: Wave 1.
 - Platform: AKINDO.
-- Official URL: **UNVERIFIED in repository**.
-- Official submission deadline/timezone: **UNVERIFIED**. A program screenshot states the Wave 1 build period ends 2026-09-16, while the team is targeting completion before 2026-09-07; confirm the binding AKINDO deadline.
+- Official program: https://midnight.network/hackathon/buildathon
+- Registration/submission page: https://app.akindo.io/wave-hacks/jaMZjqPOBsLXvjdG
+- Official submission deadline/timezone: **UNVERIFIED**. The official Midnight program page and supplied screenshot state the Wave 1 build period ends 2026-09-16, while the team is targeting completion before 2026-09-07; confirm the binding AKINDO deadline.
 
 ## Requirements
 
@@ -22,8 +23,8 @@
 | Claim evidence | COMPLETE | Confirmed claim evidence JSON |
 | Slide deck | COMPLETE | `submission/Aletheia_Midnight_Buildathon_Wave1.pptx` |
 | Demo video URL | P0 — UNVERIFIED | Record/upload and add URL |
-| Repository push | COMPLETE | Branch `codex/adopt-preprod-contract` at `afa0019`; CI and security checks pass |
-| Merge to default branch | P0 — UNVERIFIED | PR #17 is open as a draft and requires owner approval to merge |
+| Repository push | COMPLETE | PR #17 release merged to main at `0b76d57`; main Compact CI passed |
+| Merge to default branch | COMPLETE | PR #17 merged 2026-09-04 at `0b76d57` |
 | AKINDO form submission | P0 — UNVERIFIED | Complete and capture confirmation |
 | GitHub topic `midnightntwrk` | COMPLETE | Confirmed on the public repository |
 
@@ -46,18 +47,18 @@
 
 ## P0
 
-- Merge PR #17 to the default branch after owner approval.
-- Record/upload the demo video and add the final URL.
+- Owner to provide the demo-video URL; video creation/upload is excluded from this correction pass.
 - Confirm the official deadline/timezone and submit through AKINDO.
 
 ## P1
 
 - Capture one same-program duplicate rejection on Preprod.
 - Capture one second-program claim demonstrating a different nullifier.
-- Make backend health advertise the current contract address.
+- Capture a verified chain-to-backend allocation flow; standalone chain evidence does not establish inventory finalization.
+- Health discovery correction is implemented with regression tests; hosted rollout must be verified after deployment.
 
 ## Gate
 
 - Core Midnight mechanism: **READY**.
 - Overall submission: **NOT READY** until the P0 packaging items are verified.
-- Conservative readiness score: **88/100**.
+- Core evidence is verified; no official score or complete rules compliance is claimed. Team eligibility, registration and the binding form/rules still require verification.

@@ -1,7 +1,7 @@
 const API_ORIGIN = process.env.ALETHIA_API_ORIGIN;
 const SITES_TOKEN = process.env.ALETHIA_SITES_TOKEN;
 
-export async function forwardAlethia(req, res, endpoint, allowedMethods) {
+export async function forwardAlethia(req, res, endpoint, allowedMethods, transformResponse) {
   if (!allowedMethods.includes(req.method)) {
     res.setHeader('allow', allowedMethods.join(', '));
     return res.status(405).json({ error: 'Method not allowed.' });
@@ -27,6 +27,7 @@ export async function forwardAlethia(req, res, endpoint, allowedMethods) {
     res.status(upstream.status);
     res.setHeader('content-type', upstream.headers.get('content-type') || 'application/json; charset=utf-8');
     res.setHeader('cache-control', 'no-store');
+    if (upstream.ok && transformResponse) return res.json(transformResponse(JSON.parse(text)));
     return res.send(text);
   } catch {
     return res.status(502).json({ error: 'Alethia service is temporarily unavailable.' });

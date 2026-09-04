@@ -15,7 +15,7 @@
 
 Aletheia proves that a claimant satisfies an aid policy, has not claimed that program before, and can still receive available inventory. Midnight Compact keeps age, income, household, jurisdiction, credential ID, and wallet secret private; the operational backend handles stock, reservations, reconciliation, aggregate Proof Notes, inquiries, and signed receipts.
 
-Midnight is necessary because a normal database prevents duplicates by learning or assigning a reusable identity. Aletheia’s Compact contract instead verifies an issuer-signed private credential and publishes a program-scoped nullifier: stable inside one program, intentionally different across other programs.
+Midnight supplies the private credential proof and public enforcement of a program-scoped nullifier: stable for the same claimant secret inside one program, different across programs. The deployed Compact contract does not enforce inventory caps; those belong to the backend. The open demo issuer can sign for new claimant commitments, so this prototype does not establish one unique human per secret or prevent a person from obtaining multiple demo credentials.
 
 ## Capability status
 
@@ -46,8 +46,8 @@ Use **Check saved transaction** for a read-only Preprod lookup. Wallet acceptanc
 4. Obtain a signed demo credential bound to the private claimant commitment.
 5. Reserve operational inventory before spending proving resources.
 6. Generate the ZK proof and approve the Compact call in the selected Connector API v4 wallet.
-7. Record transaction, block, contract, nullifier, inventory, and receipt evidence.
-8. Retry the same program to see duplicate rejection; another program derives a different nullifier.
+7. Inspect chain evidence separately from backend reservation and receipt evidence. The captured standalone claim proves chain execution only.
+8. Compiled tests demonstrate duplicate rejection for the same secret/program and different nullifiers across programs. Additional public rejection/cross-program captures remain pending.
 
 ## Repository map
 
@@ -78,7 +78,7 @@ npm test
 npm run typecheck
 ```
 
-Set `ALETHEIA_DEMO_ISSUER_SECRET` (32-byte server-side hex) and `ALETHEIA_CONTRACT_ADDRESS` (deployed Preprod address) in the hosted service. `VITE_ALETHEIA_CONTRACT_ADDRESS` remains an optional build-time fallback. Never use the demo issuer for beneficiary decisions. Production requires an accountable issuer, independent chain confirmation, appeals, redemption reconciliation, and managed keys.
+Set `ALETHEIA_DEMO_ISSUER_SECRET` (32-byte server-side hex) and `ALETHEIA_CONTRACT_ADDRESS` (deployed Preprod address) in the hosted service. `VITE_ALETHEIA_CONTRACT_ADDRESS` remains an optional build-time fallback. `/api/health` exposes the validated hosted address as `contractAddress` with `midnightNetwork: preprod`; `midnightCompact` reports configuration, not a fresh chain/prover health check. Never use the demo issuer for beneficiary decisions. Production requires an accountable issuer, independent chain confirmation, appeals, redemption reconciliation, and managed keys.
 
 For explicitly approved local use of the existing production demo issuer, set `ALETHEIA_DEMO_ISSUER_ORIGIN=https://alethia-pi.vercel.app` in the development-server environment. This forwards only a subject commitment and demo profile to that fixed issuer; no wallet seed, private key, cookies, or authorization headers are forwarded. On Windows, start Vite with `node --use-system-ca node_modules/vite/bin/vite.js --host 127.0.0.1 --port 3000 --strictPort` to use the Windows HTTPS trust store without disabling certificate verification. The relay is local-development-only and does not change the production service.
 

@@ -20,7 +20,7 @@ The core mechanism is a Compact contract that verifies private witnesses and der
 
 ## Wave 1 proof of progress
 
-Wave 1 materially extended the Midnight functionality: compiled managed artifacts, Connector API v4 multi-wallet support, encrypted private state, strict Preprod validation, wallet-provided proving, program-scoped revocation, inventory reservation and reconciliation, redacted operations, and 22 automated tests.
+Wave 1 materially extended the Midnight functionality: compiled managed artifacts, Connector API v4 multi-wallet support, encrypted private state, strict Preprod validation, wallet-provided proving, program-scoped revocation, inventory reservation and reconciliation, redacted operations, an operational Preprod deployment, a confirmed private claim, and 53 application plus 7 compiled-contract tests.
 
 ## Judge walkthrough
 
@@ -43,9 +43,9 @@ Wave 1 materially extended the Midnight functionality: compiled managed artifact
 
 ## Honest deployment status
 
-The legacy Aletheia contract was deployed on Midnight Preprod at `024108897068de067fd95a7422ce5d3ac341edf542eeba6bd76682effada3256`. Transaction `8edfd5b6494eeed8b558ea5d51da10073841fde9e436d3f26a3f053adebd5186` is indexed in block `2368644` with a `ContractDeploy` action. The public evidence is recorded in [evidence/deployment-preprod.json](evidence/deployment-preprod.json). Its in-memory admin key was lost when the legacy deployment tab closed; it is not an operational claim contract. A replacement using the encrypted recovery/resume flow is pending.
+The operational Aletheia contract is deployed on Midnight Preprod at `7e4e3c18a2a139711f17085aef0aa66c953fa901900ab66895c9a26cca257fa5`. Its constructor initialized the signed demo issuer and all three programs without follow-up administration transactions. A real Food Support claim was confirmed in block `2391682`: transaction hash `75d2978454c959f71f71b200177a865aec9a31ee316580ac5bb0df1abddad88a`, identifier `00717e8efcb983c2cf45dcd0d763690ce7a70aa9b133aa370d8d06cfbd0a01fddd`, and program-scoped nullifier `dcf6e13059fdecbfd66672da68a5d9eb1f7bd7cb38d3cfa890ed60bb40906a6b`. The application verified both the public transaction and matching contract state; an independent query through the public Preprod indexer returned the same transaction hash and block. See [deployment evidence](evidence/deployment-preprod-operational.json) and [claim evidence](evidence/claim-preprod-food-support.json).
 
-The replacement constructor now initializes the demo issuer and all three programs in one deployment, with no separate setup calls. Linux compilation and compiled claim/rejection tests passed. The replacement deployment and first real claim transaction remain pending; test success is not live-chain evidence. The dedicated deployment page can submit and independently check a live claim once a preconfigured deployment is confirmed.
+The older contract at `024108897068de067fd95a7422ce5d3ac341edf542eeba6bd76682effada3256` remains historical deployment evidence only because its memory-only admin key was lost. It is not used for current claims.
 
 ## License
 

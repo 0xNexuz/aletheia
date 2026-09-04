@@ -1,0 +1,26 @@
+{
+  "project": "Aletheia",
+  "network": "preprod",
+  "status": "operational_verified",
+  "contractAddress": "7e4e3c18a2a139711f17085aef0aa66c953fa901900ab66895c9a26cca257fa5",
+  "configuration": {
+    "deploymentSchema": "preconfigured-v2",
+    "issuerConfigured": true,
+    "programsConfigured": [
+      "food-support-2026",
+      "medical-assistance-2026",
+      "temporary-shelter-2026"
+    ]
+  },
+  "operationalEvidence": {
+    "successfulClaimTransactionHash": "75d2978454c959f71f71b200177a865aec9a31ee316580ac5bb0df1abddad88a",
+    "successfulClaimBlockHeight": 2391682,
+    "successfulClaimProgram": "food-support-2026"
+  },
+  "verification": {
+    "method": "Successful ContractCall verified through the public Midnight Preprod indexer and claim state verified by the application",
+    "verifiedAt": "2026-09-04",
+    "helper": "src/live-claim-status.js"
+  },
+  "notes": "The exact deployment transaction identifier was not retained in this public evidence file. The contract address and successful indexed claim establish that this deployment is live and operational. The encrypted admin recovery remains device-local and is not committed."
+}

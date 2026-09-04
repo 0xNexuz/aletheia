@@ -1,5 +1,5 @@
 import './src/browser-polyfills.js';
-import { connectCompact, deployCompact, discoverCompactWallets, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
+import { connectCompact, discoverCompactWallets, prepareCompactClaim, submitPreparedCompactClaim } from './src/midnight-client.js';
 
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
@@ -87,7 +87,6 @@ const walletSelect = document.querySelector('#midnight-wallet-select');
 const generateButton = document.querySelector('.generate-proof');
 const developerDeploy = document.querySelector('#developer-deploy');
 const deployButton = document.querySelector('#deploy-midnight-contract');
-const deploymentEvidence = document.querySelector('#deployment-evidence');
 let claim = { walletKind: null, walletMaterial: null, answers: {}, receipt: null, nullifier: null };
 
 function bytesToHex(bytes) { return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
@@ -146,17 +145,7 @@ if (developerDeployMode) {
 } else {
   setTimeout(refreshMidnightWallets, 250);
 }
-deployButton?.addEventListener('click', async () => {
-  deployButton.disabled = true; deploymentEvidence.hidden = true;
-  try {
-    const wallets = refreshMidnightWallets();
-    if (wallets.length === 0) throw new Error('No compatible Connector API v4 wallet was detected.');
-    const result = await deployCompact(walletSelect.value, (state) => { walletStatus.textContent = state; });
-    walletStatus.textContent = `${result.walletName} deployed Aletheia on Preprod.`;
-    deploymentEvidence.textContent = JSON.stringify(result, null, 2); deploymentEvidence.hidden = false;
-  } catch (error) { walletStatus.textContent = error?.message || 'Preprod deployment failed.'; }
-  finally { deployButton.disabled = false; }
-});
+deployButton?.addEventListener('click', () => { window.location.assign('/deploy.html'); });
 
 document.querySelectorAll('.choice-grid button').forEach((button) => button.addEventListener('click', () => {
   const currentStep = Number(button.closest('.form-step').dataset.step);

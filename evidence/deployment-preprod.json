@@ -1,0 +1,32 @@
+{
+  "project": "Aletheia",
+  "network": "preprod",
+  "status": "legacy_deployed_admin_key_lost",
+  "operational": false,
+  "recoveryNote": "The user confirmed the legacy deployment tab was closed. That version retained its application-admin key only in memory. No backup was created. This deployment remains valid historical evidence, but a replacement with encrypted admin recovery is required for configuration and claims.",
+  "contractAddress": "024108897068de067fd95a7422ce5d3ac341edf542eeba6bd76682effada3256",
+  "transactionHash": "8edfd5b6494eeed8b558ea5d51da10073841fde9e436d3f26a3f053adebd5186",
+  "transactionIdentifiers": [
+    "00f4b86d4730abb19cf007e24294330a1a4b76705d8bfb33dd8a09fad0b7459eab",
+    "00bc7721ff7e2c4937dbb1187a6b867fefa731f03249f5b5b8f1cc6a2f5219b6a3"
+  ],
+  "contractAction": "ContractDeploy",
+  "block": {
+    "height": 2368644,
+    "hash": "4109369b0e868b24b85c52592d10c35f83a17aae4006d9afeeb4bebc23800b52",
+    "timestampMs": 1788324462001
+  },
+  "fee": "1",
+  "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
+  "verification": {
+    "method": "Public Midnight Preprod indexer query by transaction hash",
+    "verifiedAt": "2026-09-02"
+  },
+  "pending": [
+    "register demo issuer",
+    "configure food-support-2026",
+    "configure medical-assistance-2026",
+    "configure temporary-shelter-2026",
+    "submit and verify first claim"
+  ]
+}

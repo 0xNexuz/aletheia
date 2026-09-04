@@ -9,6 +9,7 @@ import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { Aletheia, witnesses } from 'aletheia-compact-contract';
 import { issueDemoCredential, demoIssuerPublicKey } from '../issuer.js';
+import { deploymentArguments, verifyDeploymentSetup } from '../../src/deployment-setup.js';
 import type { openHeadlessWallet } from './headless-wallet.js';
 
 const PRIVATE_STATE_ID = 'aletheiaPrivateState';
@@ -36,17 +37,15 @@ export async function createClaimEngine(walletContext: Awaited<ReturnType<typeof
   const compiledContract = CompiledContract.make('Aletheia', Aletheia.Contract).pipe(CompiledContract.withWitnesses(witnesses), CompiledContract.withCompiledFileAssets(ASSETS));
   return {
     providers, compiledContract, privateStateProvider,
-    async deploy() { return deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: blankState() }); },
+    async deploy() { return deployContract(providers, { compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: blankState(), args: await deploymentArguments(demoIssuerPublicKey(), programBytes) }); },
     async join(contractAddress: string) { return findDeployedContract(providers, { contractAddress, compiledContract, privateStateId: PRIVATE_STATE_ID, initialPrivateState: blankState() }); },
     async configure(contract: any) {
       const issuer = demoIssuerPublicKey();
-      await contract.callTx.registerProvider(BigInt(issuer.providerId), { x: BigInt(issuer.publicKey.x), y: BigInt(issuer.publicKey.y) });
-      const policies = [
-        ['food-support-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 2500000n, active: true }],
-        ['medical-assistance-2026', { minAge: 18n, jurisdiction: 566n, minHouseholdSize: 1n, maxAnnualIncome: 4000000n, active: true }],
-        ['temporary-shelter-2026', { minAge: 21n, jurisdiction: 566n, minHouseholdSize: 2n, maxAnnualIncome: 3000000n, active: true }]
-      ] as const;
-      for (const [id, policy] of policies) await contract.callTx.configureProgram(programBytes(id), policy);
+      await verifyDeploymentSetup({ issuer, programBytes, readLedger: async () => {
+        const state = await providers.publicDataProvider.queryContractState(String(contract.deployTxData.public.contractAddress));
+        if (!state) throw new Error('DEPLOYMENT_NOT_INDEXED');
+        return Aletheia.ledger(state.data);
+      } });
     },
     async claim(contract: any, program: string, userSecret: Uint8Array) {
       const base = blankState(userSecret); const issued = issueDemoCredential(transientHash(Bytes32Descriptor, base.userSecret).toString(), 'eligible');

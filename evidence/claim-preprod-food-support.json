@@ -1,0 +1,38 @@
+{
+  "project": "Aletheia",
+  "network": "preprod",
+  "status": "confirmed",
+  "contractAddress": "7e4e3c18a2a139711f17085aef0aa66c953fa901900ab66895c9a26cca257fa5",
+  "programId": "food-support-2026",
+  "nullifier": "dcf6e13059fdecbfd66672da68a5d9eb1f7bd7cb38d3cfa890ed60bb40906a6b",
+  "transactionIdentifier": "00717e8efcb983c2cf45dcd0d763690ce7a70aa9b133aa370d8d06cfbd0a01fddd",
+  "transactionHash": "75d2978454c959f71f71b200177a865aec9a31ee316580ac5bb0df1abddad88a",
+  "blockHeight": 2391682,
+  "contractAction": "ContractCall",
+  "verification": {
+    "applicationResult": "Live claim confirmed in Preprod and claim state matched the saved program and nullifier",
+    "independentIndexerResult": "transaction-confirmed",
+    "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
+    "verifiedAt": "2026-09-04",
+    "helper": "src/live-claim-status.js"
+  },
+  "publicFields": [
+    "programId",
+    "eligible outcome",
+    "program-scoped nullifier",
+    "contract address",
+    "transaction identifier",
+    "transaction hash",
+    "block height"
+  ],
+  "privateFieldsNotRecorded": [
+    "age",
+    "jurisdiction",
+    "household size",
+    "annual income",
+    "credential ID",
+    "issuer signature",
+    "claimant secret",
+    "wallet secret"
+  ]
+}

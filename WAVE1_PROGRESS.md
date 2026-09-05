@@ -15,7 +15,7 @@ The public repository already demonstrated the product idea, a Compact contract 
 - Added strict Preprod network and Bech32m address validation, wallet-provided proving support, and explicit transaction evidence.
 - Added encrypted private-state storage and server-side redaction boundaries.
 - Added inventory reservation, replay protection, chain reconciliation, and an auditable operational ledger.
-- Expanded automated coverage to 57 passing application/SDK tests plus 7 compiled Compact tests, including privacy, revocation, wallet compatibility, reconciliation, redaction, deployment recovery, and runtime compatibility cases.
+- Expanded automated coverage to 65 passing application/SDK tests plus 7 compiled Compact tests, including privacy, revocation, wallet compatibility, reconciliation, redaction, deployment recovery, backend chain-action verification, local-only program design, and runtime compatibility cases.
 - Pinned the patched `ws` dependency and reached a zero-vulnerability production audit.
 - Added Linux-safe lockfile and CI handling for reproducible Compact builds.
 - Deployed Aletheia to Midnight Preprod and independently verified the indexed `ContractDeploy` transaction, contract address, and block.
@@ -37,7 +37,7 @@ npm run lint
 npm audit --omit=dev
 ```
 
-The current patch passes the production build, 57 application/SDK tests, 7 compiled Compact tests, typecheck, and lint. The compiled tests cover immediate eligible claims, duplicate rejection, cross-program claims, invalid signatures, copied credentials, and ineligible credentials. An offline SDK test assembles exactly one deployment using real verifier assets. The browser-facing provider loads all 15 verifier/prover/ZKIR files, and production emits one on-chain runtime WASM. Real network evidence is recorded separately from test evidence. Local claim signing still requires an available credential issuer; public-key-only deployment configuration cannot sign credentials.
+The current patch passes the production build, 65 application/SDK tests, 7 compiled Compact tests, typecheck, and lint. The compiled tests cover immediate eligible claims, duplicate rejection, cross-program claims, invalid signatures, copied credentials, and ineligible credentials. An offline SDK test assembles exactly one deployment using real verifier assets. The browser-facing provider loads all 15 verifier/prover/ZKIR files, and production emits one on-chain runtime WASM. Real network evidence is recorded separately from test evidence. Local claim signing still requires an available credential issuer; public-key-only deployment configuration cannot sign credentials.
 
 ## Current state
 
@@ -49,6 +49,8 @@ The Compact contract and Midnight client integration are implemented and operati
 - Separated Compact eligibility/nullifier enforcement from backend inventory accounting in submission and privacy documentation.
 - Added validated hosted contract discovery to the health bridge with four behavioral regression tests, preserving backend failure responses.
 - Recorded PR #17 as merged and the public repository topic as verified.
+- Replaced the misleading “Design a program” enquiry jump with a bounded local-only policy-draft workspace; enquiries are now optional, explicitly consented, and labeled as identifiable off-chain contact.
+- Upgraded the hosted claim backend to API v4, configured the operational contract, and required a successful indexed `claim` action at that contract before inventory finalization. Production health, all three programs, the consent guard, and the local designer were probed successfully after PR #19.
 - Demo-video production is excluded from this update; owner upload and final AKINDO submission remain unverified.
 
 ## Next Wave

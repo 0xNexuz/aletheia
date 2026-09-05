@@ -10,7 +10,7 @@
 - **Website:** https://alethia-pi.vercel.app
 - **Audience:** humanitarian field teams, program leaders, auditors, and privacy infrastructure judges
 - **Feature to emphasize:** issuer-signed private eligibility plus program-scoped duplicate prevention and inventory caps
-- **Viewer action:** try the claim lab, retry a program to see duplicate rejection, then send a private program-design inquiry
+- **Viewer action:** try the claim lab, inspect the real Preprod evidence, then draft program rules locally without sending personal data
 - **Preview format:** 60-second judge walkthrough in [DEMO.md](DEMO.md)
 
 Aletheia proves that a claimant satisfies an aid policy, has not claimed that program before, and can still receive available inventory. Midnight Compact keeps age, income, household, jurisdiction, credential ID, and wallet secret private; the operational backend handles stock, reservations, reconciliation, aggregate Proof Notes, inquiries, and signed receipts.
@@ -46,7 +46,7 @@ Use **Check saved transaction** for a read-only Preprod lookup. Wallet acceptanc
 4. Obtain a signed demo credential bound to the private claimant commitment.
 5. Reserve operational inventory before spending proving resources.
 6. Generate the ZK proof and approve the Compact call in the selected Connector API v4 wallet.
-7. Inspect chain evidence separately from backend reservation and receipt evidence. The captured standalone claim proves chain execution only.
+7. The hosted backend independently requires a successful `claim` entry point at the configured contract before it finalizes inventory. The captured standalone claim remains chain-only evidence because it was submitted outside this reservation flow.
 8. Compiled tests demonstrate duplicate rejection for the same secret/program and different nullifiers across programs. Additional public rejection/cross-program captures remain pending.
 
 ## Repository map
@@ -84,7 +84,7 @@ For explicitly approved local use of the existing production demo issuer, set `A
 
 ## Feedback ownership
 
-The inquiry form writes to the project owner’s private Sites database and returns a reference number. It is not public. Automatic email notification and an owner inbox are pending.
+The program designer creates a bounded JSON draft entirely in the page and does not send or deploy it. The separate, optional enquiry form is conventional off-chain contact: it requires explicit consent, stores its supplied contact fields in the owner's Sites database, and is not anonymous or zero knowledge. It does not automatically attach wallet or claim identifiers. Automatic deletion, email notification, and an owner inbox are pending.
 
 ## License
 

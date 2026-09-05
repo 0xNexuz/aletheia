@@ -185,8 +185,11 @@ async function createClaim() {
     document.querySelector('#receipt-short').textContent = `${claim.receipt.receipt.id.slice(0, 8)}…`;
     const txHash = claim.receipt.receipt.txHash;
     const compact = claim.receipt.receipt.proofMode === 'midnight-compact';
-    document.querySelector('#result-mode').textContent = compact ? 'Compact transaction submitted' : 'Signed simulation receipt';
-    document.querySelector('#result-proof').textContent = compact ? 'valid' : 'simulated';
+    const confirmed = !compact || claim.receipt.receipt.status === 'claim_confirmed';
+    document.querySelector('#result-title').textContent = confirmed ? 'Claim approved' : 'Claim submitted';
+    document.querySelector('#result-mode').textContent = compact ? (confirmed ? 'Compact transaction confirmed' : 'Compact confirmation pending') : 'Signed simulation receipt';
+    document.querySelector('#result-proof').textContent = compact ? (confirmed ? 'valid' : 'awaiting confirmation') : 'simulated';
+    document.querySelector('#result-inventory').textContent = confirmed ? 'allocated' : 'reserved pending chain check';
     document.querySelector('#tx-short').textContent = txHash ? `Preprod ${txHash.slice(0, 8)}…` : 'not applicable';
     document.querySelector('#evidence-program').textContent = programId; document.querySelector('#evidence-mode').textContent = claim.receipt.receipt.proofMode;
     document.querySelector('#evidence-nullifier').textContent = nullifier; document.querySelector('#evidence-tx').textContent = txHash || 'none — simulation';
@@ -222,5 +225,5 @@ document.querySelectorAll('.restart-proof').forEach((button) => button.addEventL
 document.querySelector('#contact-form')?.addEventListener('submit', async (event) => {
   event.preventDefault(); const form = event.currentTarget; const status = form.querySelector('.form-status'); const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true; status.textContent = 'Sending…';
-  try { const payload = Object.fromEntries(new FormData(form)); const response = await fetch('/api/inquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Message could not be sent.'); status.textContent = 'Saved for the Alethia site owner. Your reference is ' + data.reference + '. No email notification is sent yet.'; form.reset(); } catch (error) { status.textContent = error.message; } finally { submit.disabled = false; }
+  try { const payload = Object.fromEntries(new FormData(form)); const response = await fetch('/api/inquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Message could not be sent.'); status.textContent = 'Enquiry stored for the site owner. Reference: ' + data.reference + '. This contact message is off-chain and is not anonymous.'; form.reset(); } catch (error) { status.textContent = error.message; } finally { submit.disabled = false; }
 });

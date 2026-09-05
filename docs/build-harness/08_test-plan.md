@@ -8,7 +8,7 @@ Prove that credentials cannot be forged, private inputs are not exposed, same-pr
 
 | Area | Evidence | Status |
 |---|---|---|
-| Unit/integration application tests | `tests/*.test.mjs` — 57 passing | VERIFIED |
+| Unit/integration application tests | `tests/*.test.mjs` — 65 passing | VERIFIED |
 | Compiled Compact tests | `contract` — 7 passing | VERIFIED |
 | Typecheck | Root and contract TypeScript | VERIFIED |
 | Lint | App, API, library, tests, scripts | VERIFIED |
@@ -30,6 +30,8 @@ Prove that credentials cannot be forged, private inputs are not exposed, same-pr
 - Sensitive evidence redaction.
 - Duplicate browser runtime regression.
 - Hosted health configuration, invalid/missing addresses, upstream failures, secret exclusion and method restrictions.
+- Backend rejection of successful but unrelated contract actions.
+- Local-only program drafting, input bounds, and explicit separation from consented enquiries.
 
 ## Commands
 

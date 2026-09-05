@@ -30,7 +30,9 @@ Protect claimant privacy, prevent same-program duplicate claims, prevent unsuppo
 | Reuse credential with another secret | Credential bound to subject commitment | Copied-credential test | VERIFIED |
 | Claim same program twice | Program-scoped nullifier membership check | Compiled duplicate test | VERIFIED locally; Preprod rejection capture pending |
 | Link a claimant across programs | Nullifier includes program ID | Cross-program compiled test | VERIFIED locally; second Preprod capture pending |
-| Retry uncertain transaction | Durable pending ID and read-only reconciliation | Deployment/claim status tests | VERIFIED |
+| Retry uncertain deployment/demo transaction | Durable pending ID and read-only reconciliation | Deployment/claim status tests | VERIFIED |
+| Attach unrelated transaction to inventory | Require indexed ID, `SUCCESS`, `claim` entry point and configured contract | Backend chain-verification tests | PARTIAL — exact program/nullifier state binding pending |
+| Correlate optional enquiry with claim | Separate table and no claim/wallet identifier attachment | Privacy regression test | PARTIAL — operator/hosting metadata and timing remain visible |
 | Leak recovery or wallet seed | Encrypted recovery; no seed entry/upload path | Recovery/redaction tests | VERIFIED |
 | Relay to arbitrary issuer | Fixed approved origin and bounded payload | Relay tests | VERIFIED |
 
@@ -48,4 +50,4 @@ Protect claimant privacy, prevent same-program duplicate claims, prevent unsuppo
 
 ## Residual Risk
 
-Metadata and timing may correlate activity. The demo issuer is centralized. The backend's operational finalization is not yet independently gated on indexer confirmation. Security review is internal only.
+Metadata and timing may correlate activity. The demo issuer is centralized. Backend finalization checks the public indexer and intended contract action but does not yet bind the on-chain program/nullifier state to its reservation. Optional enquiries are identifiable off-chain contact with no automated deletion. Security review is internal only.

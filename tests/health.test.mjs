@@ -18,7 +18,7 @@ function response() {
 test('health advertises the hosted contract, preserves backend status and excludes secrets', async (t) => {
   t.mock.method(globalThis, 'fetch', async (_url, options) => {
     assert.equal(options.headers['OAI-Sites-Authorization'], 'Bearer test-server-only-token');
-    return Response.json({ ok: true, midnightCompact: false, receiptAlgorithm: 'test' });
+    return Response.json({ ok: true, apiVersion: 4, mode: 'compact-ready-private-allocation', midnightCompact: true, contractAddress: address, receiptAlgorithm: 'test' });
   });
   const old = process.env.ALETHEIA_CONTRACT_ADDRESS;
   t.after(() => { if (old === undefined) delete process.env.ALETHEIA_CONTRACT_ADDRESS; else process.env.ALETHEIA_CONTRACT_ADDRESS = old; });
@@ -37,7 +37,7 @@ test('health advertises the hosted contract, preserves backend status and exclud
 });
 
 test('health fails closed for missing or invalid hosted addresses, even with stale upstream data', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => Response.json({ ok: true, midnightCompact: true, contractAddress: address }));
+  t.mock.method(globalThis, 'fetch', async () => Response.json({ ok: true, apiVersion: 4, mode: 'compact-ready-private-allocation', midnightCompact: true, contractAddress: address }));
   const old = process.env.ALETHEIA_CONTRACT_ADDRESS;
   t.after(() => { if (old === undefined) delete process.env.ALETHEIA_CONTRACT_ADDRESS; else process.env.ALETHEIA_CONTRACT_ADDRESS = old; });
   for (const value of ['', 'not-an-address', 'ab'.repeat(31), 'ab'.repeat(33)]) {
@@ -47,6 +47,18 @@ test('health fails closed for missing or invalid hosted addresses, even with sta
     assert.equal(res.body.midnightCompact, false);
     assert.equal(res.body.contractAddress, null);
   }
+});
+
+test('health refuses to mask an outdated claim backend as Compact-ready', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => Response.json({ ok: true, mode: 'signed-ledger-with-midnight-preprod-anchor', contractAddress: address }));
+  const old = process.env.ALETHEIA_CONTRACT_ADDRESS;
+  t.after(() => { if (old === undefined) delete process.env.ALETHEIA_CONTRACT_ADDRESS; else process.env.ALETHEIA_CONTRACT_ADDRESS = old; });
+  process.env.ALETHEIA_CONTRACT_ADDRESS = address;
+  const res = response();
+  await handler({ method: 'GET', url: '/api/health' }, res);
+  assert.equal(res.body.midnightCompact, false);
+  assert.equal(res.body.midnightStatus, 'backend-incompatible');
+  assert.equal(res.body.contractAddress, null);
 });
 
 test('health preserves upstream failure and redacts transport/parse failures', async (t) => {

@@ -10,7 +10,9 @@
 | Operational contract | REAL — TESTNET | `7e4e3c...57fa5` | Constructor-preconfigured |
 | Browser wallet discovery | REAL — TESTNET | Connector API v4 integration | Tested with 1AM |
 | Simulation claim flow | SIMULATED | Labeled UI path | Never represented as chain proof |
-| Inventory reservations/receipts | REAL — LOCAL/HOSTED BACKEND | Backend tests and APIs | Not finalized by the standalone chain demo |
+| Inventory reservations/receipts | REAL — HOSTED BACKEND | Backend tests and APIs | Chain gate verifies ID, success, claim entry point and contract; exact program/nullifier binding is PARTIAL |
+| Local program-rule drafting | REAL — LOCAL | `src/program-draft.js`, designer tests | Downloads a draft; does not save or deploy |
+| Optional program enquiry | REAL — HOSTED BACKEND | Separate consented `/api/inquiries` path | Conventional contact; not anonymous or ZK |
 | Accountable production issuer | PLANNED | None | Demo issuer is test-only |
 | Mainnet deployment | PLANNED | None | No mainnet claim |
 | Offline field mode | PLANNED | None | Roadmap only |
@@ -32,5 +34,5 @@
 - Submission: updated with exact public evidence.
 - UI: distinguishes Midnight Compact from simulation.
 - Health bridge now publishes the validated hosted `contractAddress` with Preprod configuration metadata. Backend failure remains a failure; this is not independent chain or prover verification.
-- Compact does not enforce inventory limits. Backend allocation completion is not established by the captured standalone transaction.
+- Compact does not enforce inventory limits. The backend has a public-indexer confirmation gate, but exact program/nullifier-to-reservation binding and a captured end-to-end allocation remain pending.
 - Duplicate rejection is for a fixed secret/program. The demo issuer does not enforce uniqueness of real-world people.

@@ -20,7 +20,7 @@ The core mechanism is a Compact contract that verifies private witnesses and der
 
 ## Wave 1 proof of progress
 
-Wave 1 materially extended the Midnight functionality: compiled managed artifacts, Connector API v4 multi-wallet support, encrypted private state, strict Preprod validation, wallet-provided proving, program-scoped revocation, inventory reservation and reconciliation, redacted operations, an operational Preprod deployment, a confirmed private claim, and 57 application plus 7 compiled-contract tests.
+Wave 1 materially extended the Midnight functionality: compiled managed artifacts, Connector API v4 multi-wallet support, encrypted private state, strict Preprod validation, wallet-provided proving, program-scoped revocation, inventory reservation and reconciliation, redacted operations, an operational Preprod deployment, a confirmed private claim, and 65 application plus 7 compiled-contract tests.
 
 ## Judge walkthrough
 

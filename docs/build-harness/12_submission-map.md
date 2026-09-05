@@ -23,8 +23,8 @@
 | Claim evidence | COMPLETE | Confirmed claim evidence JSON |
 | Slide deck | COMPLETE | `submission/Aletheia_Midnight_Buildathon_Wave1.pptx` |
 | Demo video URL | P0 — UNVERIFIED | Record/upload and add URL |
-| Repository push | COMPLETE | PR #17 release merged to main at `0b76d57`; main Compact CI passed |
-| Merge to default branch | COMPLETE | PR #17 merged 2026-09-04 at `0b76d57` |
+| Repository push | COMPLETE | PR #19 merged to main at `2362bcd`; validation and secret scan passed |
+| Merge to default branch | COMPLETE | PR #19 merged 2026-09-05 at `2362bcd` |
 | AKINDO form submission | P0 — UNVERIFIED | Complete and capture confirmation |
 | GitHub topic `midnightntwrk` | COMPLETE | Confirmed on the public repository |
 
@@ -55,7 +55,7 @@
 - Capture one same-program duplicate rejection on Preprod.
 - Capture one second-program claim demonstrating a different nullifier.
 - Capture an end-to-end chain-to-backend allocation and bind the reservation to the exact on-chain program/nullifier state. The gate verifies transaction ID, success, `claim` entry point and contract; standalone evidence does not establish inventory finalization.
-- Health discovery correction is implemented with regression tests; hosted rollout must be verified after deployment.
+- Hosted rollout is VERIFIED for API v4 compatibility, configured contract discovery, three programs, consent rejection, and the local-only program designer.
 
 ## Gate
 

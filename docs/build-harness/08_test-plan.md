@@ -12,7 +12,8 @@ Prove that credentials cannot be forged, private inputs are not exposed, same-pr
 | Compiled Compact tests | `contract` — 7 passing | VERIFIED |
 | Typecheck | Root and contract TypeScript | VERIFIED |
 | Lint | App, API, library, tests, scripts | VERIFIED |
-| Production build | Vercel deployment `dpl_Ce1LAxrft4tfJf7ZuvGpTrGGyxav` | VERIFIED |
+| Production build | Vercel deployment `dpl_CoNGMkVG1DRbtEYqWLnHiM8B6rr3` | VERIFIED |
+| Hosted backend compatibility | API v4 health, 3 programs, contract match, consent rejection | VERIFIED |
 | Real Preprod claim | Block `2391682` | VERIFIED |
 
 ## Adversarial Cases

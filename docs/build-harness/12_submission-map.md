@@ -54,7 +54,7 @@
 
 - Capture one same-program duplicate rejection on Preprod.
 - Capture one second-program claim demonstrating a different nullifier.
-- Capture a verified chain-to-backend allocation flow; standalone chain evidence does not establish inventory finalization.
+- Capture an end-to-end chain-to-backend allocation and bind the reservation to the exact on-chain program/nullifier state. The gate verifies transaction ID, success, `claim` entry point and contract; standalone evidence does not establish inventory finalization.
 - Health discovery correction is implemented with regression tests; hosted rollout must be verified after deployment.
 
 ## Gate

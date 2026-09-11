@@ -39,6 +39,49 @@ The same page exposes **Submit live demo claim** after setup verification. It re
 
 Use **Check saved transaction** for a read-only Preprod lookup. Wallet acceptance is recorded separately from chain confirmation; submission failures retain a redacted error and never clear the pending marker. If an attempt is unconfirmed, an explicitly acknowledged fresh attempt can retain the same encrypted key and archive the old ID. An empty indexer response is not proof of non-submission: both attempts could later land and consume testnet DUST. The retry path checks again and resumes a confirmed deployment instead of knowingly duplicating it.
 
+## Privacy model
+
+Aletheia is designed to prove eligibility without publishing the claimant's underlying personal information.
+
+### What an observer can learn
+
+A successful Midnight claim may reveal:
+
+- the selected aid program;
+- that the private eligibility conditions were satisfied;
+- a program-scoped nullifier used for duplicate prevention;
+- public program policy thresholds;
+- issuer metadata;
+- applicable program-scoped revocation handles;
+- the contract address, transaction ID and block reference for a real confirmed claim.
+
+The operational backend may also retain the program ID, scoped nullifier, randomized commitment, proof mode and confirmed transaction references required to operate the aid program.
+
+### What an observer cannot learn from the public claim
+
+Aletheia does not publish the claimant's raw:
+
+- age;
+- annual income;
+- household size;
+- jurisdiction;
+- credential ID;
+- claimant secret;
+- issuer signature;
+- complete private credential.
+
+Operational allocation receipts also exclude raw eligibility answers and wallet addresses.
+
+The scoped nullifier is intentionally stable only for the same claimant secret inside the same program and differs across programs, reducing cross-program linkability.
+
+### Trust boundaries
+
+Private proof inputs are supplied to the selected Midnight wallet/proving provider. A remote prover may therefore receive private proof inputs depending on the wallet/provider configuration; Aletheia does not claim that every proving configuration keeps all inputs permanently on-device.
+
+The public demo issuer is for testing and does not establish one unique real-world human per claimant secret. Production deployments require accountable credential issuance, explicit consent, managed keys, retention rules, appeals and revocation procedures.
+
+For the complete privacy analysis, see [PRIVACY.md](PRIVACY.md).
+
 ## Claim flow
 
 1. Select Food Support, Medical Assistance, or Temporary Shelter.
@@ -82,6 +125,20 @@ npm run typecheck
 Set `ALETHEIA_DEMO_ISSUER_SECRET` (32-byte server-side hex) and `ALETHEIA_CONTRACT_ADDRESS` (deployed Preprod address) in the hosted service. `VITE_ALETHEIA_CONTRACT_ADDRESS` remains an optional build-time fallback. `/api/health` exposes the validated hosted address as `contractAddress` with `midnightNetwork: preprod`; `midnightCompact` reports configuration, not a fresh chain/prover health check. Never use the demo issuer for beneficiary decisions. Production requires an accountable issuer, independent chain confirmation, appeals, redemption reconciliation, and managed keys.
 
 For explicitly approved local use of the existing production demo issuer, set `ALETHEIA_DEMO_ISSUER_ORIGIN=https://alethia-pi.vercel.app` in the development-server environment. This forwards only a subject commitment and demo profile to that fixed issuer; no wallet seed, private key, cookies, or authorization headers are forwarded. On Windows, start Vite with `node --use-system-ca node_modules/vite/bin/vite.js --host 127.0.0.1 --port 3000 --strictPort` to use the Windows HTTPS trust store without disabling certificate verification. The relay is local-development-only and does not change the production service.
+
+### Test evidence
+
+Aletheia's Compact CI validates the production build automatically.
+
+- ✅ 7 Compact contract tests passed
+- ✅ 65 application tests passed
+- ✅ TypeScript checks passed
+- ✅ Lint passed
+- ✅ Production build passed
+
+![Aletheia passing test output](assets/IMG_20260911_185405.jpg)
+
+See the full workflow in [`.github/workflows/compact-ci.yml`](.github/workflows/compact-ci.yml).
 
 ## Feedback ownership
 

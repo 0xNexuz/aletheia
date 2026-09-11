@@ -1,5 +1,7 @@
 # Aletheia
 
+[![Compact CI](https://github.com/0xNexuz/aletheia/actions/workflows/compact-ci.yml/badge.svg)](https://github.com/0xNexuz/aletheia/actions/workflows/compact-ci.yml)
+
 **Prevent duplicate aid claims and over-allocation without building a public identity database.**
 
 [Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Wave 1 progress](WAVE1_PROGRESS.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md)

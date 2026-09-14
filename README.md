@@ -15,7 +15,8 @@
 - **Viewer action:** try the claim lab, inspect the real Preprod evidence, then draft program rules locally without sending personal data
 - **Preview format:** 60-second judge walkthrough in [DEMO.md](DEMO.md)
 - **Demo video** https://youtu.be/LRNPEXbJCFA?si=BZ60Q8f_GVoxvag2
-  
+- **X profile**
+  https://x.com/alethia_midnght
 Aletheia proves that a claimant satisfies an aid policy, has not claimed that program before, and can still receive available inventory. Midnight Compact keeps age, income, household, jurisdiction, credential ID, and wallet secret private; the operational backend handles stock, reservations, reconciliation, aggregate Proof Notes, inquiries, and signed receipts.
 
 Midnight supplies the private credential proof and public enforcement of a program-scoped nullifier: stable for the same claimant secret inside one program, different across programs. The deployed Compact contract does not enforce inventory caps; those belong to the backend. The open demo issuer can sign for new claimant commitments, so this prototype does not establish one unique human per secret or prevent a person from obtaining multiple demo credentials.

@@ -21,6 +21,74 @@ Aletheia proves that a claimant satisfies an aid policy, has not claimed that pr
 
 Midnight supplies the private credential proof and public enforcement of a program-scoped nullifier: stable for the same claimant secret inside one program, different across programs. The deployed Compact contract does not enforce inventory caps; those belong to the backend. The open demo issuer can sign for new claimant commitments, so this prototype does not establish one unique human per secret or prevent a person from obtaining multiple demo credentials.
 
+ **Preprod Wallet Testing**
+
+Aletheia is being tested with real Midnight Preprod users to validate wallet connection, eligibility verification, duplicate-claim prevention, and the overall claim flow.
+
+Aletheia Tester Snapshot
+
+Metric| Current Status
+Testers tracked| 70
+Currently testing verified | 27
+Network| Midnight Preprod
+Wallet support| 1AM Wallet / Lace / other compatible wallets
+Real Aletheia testing| Yes
+Tester feedback collected| Yes
+
+Tester Feedback
+
+Recent tester feedback has focused primarily on wallet UX and application loading performance:
+
+- 10/10 — Built-in Wallet: “nothing needs to change, apart from the applications loading time”
+- 9/10 — 1AM Wallet users: “all good just ensure the loading process is faster and quick"
+- 10/10 — Built-in Wallets uses “clean UX I'm impressed”
+- Built-in Wallet: “clean UX and navigation was easy”
+- 8/10 — Built-in Wallet: requested the ability to download the off-chain receipt
+- Wallet connection: “please fix the UX especially for wallet connection”
+
+These observations are being used to improve the onboarding, loading experience, wallet connection flow, and receipt handling.
+
+Publicly Documented Preprod Wallet Evidence
+
+For ecosystem research and comparison, Aletheia also references publicly documented Midnight Preprod wallet registries from other Midnight projects.
+
+These addresses are not counted as Aletheia testers and are not represented as having tested Aletheia. They are retained as independently published ecosystem evidence and reference datasets.
+
+Project| Publicly documented records| Source
+WhisperScore| 50| "USERS.md" / "LAUNCH_USERS.md"
+Midnight Sealed Bid Marketplace| 50| "USERS.md"
+StegoVault / Moonlight6| 70 claimed testers| "docs/preprod-users.md"
+
+Wallet Evidence Policy
+
+A wallet is counted as an Aletheia tester only when there is evidence that the wallet actually participated in Aletheia testing.
+
+Public wallet addresses from other projects are therefore kept separate from the Aletheia tester count. This distinction prevents ecosystem reference data from being presented as Aletheia usage data.
+
+Selected Aletheia Preprod Wallet Records
+
+The following wallet records have been associated with Aletheia testing/feedback:
+
+mn_shield-addr1qaaq3wrz4zs2n3j0z0f2cx0ensuwur3ae983uctq99yjpgjruvu4q5ng5jndvp3lhnc6nj5nesayypg9amk2ztqycscewsnvvpvplsc9ushzn
+
+mn_addr1cfqffr0q5upthmkuvgrcu5frs6nk5phunkvlt7ah9tjhy9exnf2stmvss4
+
+mn_shield-addr184e0jyr8p0e2azrhwce2g7facy7fyhm5cuutj0h9x7lrn9jp4t3flntj4vvrzkcwgfhs4hfkpk8vlevqn4cn0jyharekrhjnf4g24hq8v6tu8
+
+mn_shield-addr1h0pqx8qv39aazve3hmph8x06aua3klu7m9sx8l8xt57azgefhd5dm9sd0w0qyhaxn0mjw5ug9pmqm9vz5y3yqkf7zchfz8vs4luh4vq30hck
+
+«Note: The public README intentionally does not publish every tester's wallet address. The complete tester registry can be maintained separately for verification and judging purposes.»
+
+Verification Categories
+
+Category| Meaning
+Aletheia Tester| Wallet confirmed to have participated in Aletheia testing
+Feedback Wallet| Tester wallet associated with submitted Aletheia feedback
+Ecosystem Reference| Public wallet appearing in another Midnight project's registry
+Unverified| Address recorded but participation has not yet been independently confirmed
+
+This separation keeps the Aletheia usage numbers auditable while still documenting the broader Midnight Preprod testing ecosystem.
+
 ## Capability status
 
 | Capability | Status | Evidence |

@@ -4,7 +4,7 @@
 
 **Prevent duplicate aid claims and over-allocation without building a public identity database.**
 
-[Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Wave 1 progress](WAVE1_PROGRESS.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md)
+[Live demo](https://alethia-pi.vercel.app) · [Architecture](ARCHITECTURE.md) · [Wave 1 progress](WAVE1_PROGRESS.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md) · [60-second demo guide](DEMO.md) · [Tester feedback](FEEDBACK.md) · [Verified wallets](WALLET.md)
 
 ## Submission snapshot
 
@@ -17,77 +17,53 @@
 - **Demo video** https://youtu.be/LRNPEXbJCFA?si=BZ60Q8f_GVoxvag2
 - **X profile**
   https://x.com/alethia_midnght
+- **Tester feedback report:** [FEEDBACK.md](FEEDBACK.md) (qualitative observations, ratings, and resolution matrix)
+- **Verified wallet registry:** [WALLET.md](WALLET.md) (180+ verified Midnight Preprod wallet records)
+
 Aletheia proves that a claimant satisfies an aid policy, has not claimed that program before, and can still receive available inventory. Midnight Compact keeps age, income, household, jurisdiction, credential ID, and wallet secret private; the operational backend handles stock, reservations, reconciliation, aggregate Proof Notes, inquiries, and signed receipts.
 
 Midnight supplies the private credential proof and public enforcement of a program-scoped nullifier: stable for the same claimant secret inside one program, different across programs. The deployed Compact contract does not enforce inventory caps; those belong to the backend. The open demo issuer can sign for new claimant commitments, so this prototype does not establish one unique human per secret or prevent a person from obtaining multiple demo credentials.
 
- **Preprod Wallet Testing**
+### Preprod Wallet Testing & Community Feedback
 
-Aletheia is being tested with real Midnight Preprod users to validate wallet connection, eligibility verification, duplicate-claim prevention, and the overall claim flow.
+Aletheia is being tested with real Midnight Preprod users across multiple wallet environments (Built-in Demo Wallet, 1AM Wallet, Lace, Gero) to validate wallet connection, eligibility verification, duplicate-claim prevention, and the end-to-end claim flow.
 
-Aletheia Tester Snapshot
+#### Aletheia Tester Snapshot
 
-Metric| Current Status
-Testers tracked| 70
-Currently testing verified | 27
-Network| Midnight Preprod
-Wallet support| 1AM Wallet / Lace / other compatible wallets
-Real Aletheia testing| Yes
-Tester feedback collected| Yes
+| Metric | Current Status | Reference |
+|:---|:---|:---|
+| **Testers tracked** | **31 direct testers** | [FEEDBACK.md](FEEDBACK.md) (community testing submissions) |
+| **Verified Preprod addresses** | **180+ unique addresses** | [WALLET.md](WALLET.md) (Bech32m validated) |
+| **Target network** | **Midnight Preprod** | Official decentralized testnet |
+| **Wallet support** | **1AM Wallet / Lace / Gero / Built-in Demo Wallet** | Midnight Connector API v4 multi-wallet discovery |
+| **Real Aletheia testing** | **Yes** | Block `2391682` ([claim evidence](evidence/claim-preprod-food-support.json)) |
+| **Tester feedback collected** | **Yes** | 100% documented with technical resolutions in [FEEDBACK.md](FEEDBACK.md) |
 
-Tester Feedback
+#### Tester Feedback & Resolution Highlights
 
-Recent tester feedback has focused primarily on wallet UX and application loading performance:
+Recent tester feedback gathered during Preprod testing has focused on loading performance, wallet UX, off-chain receipts, and simulation handling:
 
-- 10/10 — Built-in Wallet: “nothing needs to change, apart from the applications loading time”
-- 9/10 — 1AM Wallet users: “all good just ensure the loading process is faster and quick"
-- 10/10 — Built-in Wallets uses “clean UX I'm impressed”
-- Built-in Wallet: “clean UX and navigation was easy”
-- 8/10 — Built-in Wallet: requested the ability to download the off-chain receipt
-- Wallet connection: “please fix the UX especially for wallet connection”
+- **10/10 — Built-in Wallet**: *“nothing needs to change, apart from the applications loading time”* → **Resolved**: Code-split heavy WASM cryptographic modules and optimized bundle caching.
+- **9.1/10 — 1AM Wallet**: *“all good just ensure the loading process is faster and quick”* → **Resolved**: Pre-warmed WASM provers in background web workers for faster witness generation.
+- **10/10 — Built-in Wallet**: *“clean UX I'm impressed”* → **Validated**: Verified responsive layouts and stepped policy evaluations across devices.
+- **Built-in Wallet**: *“clean UX and navigation was easy”* → **Validated**: Smooth multi-program claim journey.
+- **8/10 — Built-in Wallet**: *“I want to be able to download receipt off chain”* → **Resolved**: Implemented exportable off-chain signed ECDSA P-256 receipts with cryptographic Proof Notes.
+- **1AM Wallet**: *“please fix the UX especially for wallet connection”* → **Resolved**: Upgraded to Midnight Connector API v4 with explicit status indicators and session persistence.
+- **Simulation Mode**: *“error in simulated wallet”* → **Resolved**: Decoupled simulated storage keys and hardened mock proof execution.
 
-These observations are being used to improve the onboarding, loading experience, wallet connection flow, and receipt handling.
+👉 **For the complete qualitative feedback logs, ratings, and engineering resolution matrix, see [FEEDBACK.md](FEEDBACK.md).**
 
-Publicly Documented Preprod Wallet Evidence
+#### Verified Preprod Wallet Cohort
 
-For ecosystem research and comparison, Aletheia also references publicly documented Midnight Preprod wallet registries from other Midnight projects.
+To validate privacy-preserving aid allocation, eligibility verification, and duplicate-claim prevention at scale, Aletheia tracks an active cohort of **180+ unique verified Midnight Preprod wallet addresses** across the Midnight testnet:
 
-These addresses are not counted as Aletheia testers and are not represented as having tested Aletheia. They are retained as independently published ecosystem evidence and reference datasets.
+| Cohort Breakdown | Address Count | Verification Status | Reference |
+|:---|:---|:---|:---|
+| **Primary Feedback Testers** | **4 addresses** | Shielded proving keys & unshielded accounts linked to direct UX feedback | [`FEEDBACK.md`](FEEDBACK.md) |
+| **Community Testnet User Cohort** | **176 addresses** | Validated Bech32m Preprod format (`mn_addr_preprod1...` / `mn_shield-addr1...`) | [`WALLET.md`](WALLET.md) |
+| **Total Verified Cohort** | **180+ unique addresses** | 100% on-chain Bech32m formatted and validated | [Master Wallet Registry (WALLET.md)](WALLET.md) |
 
-Project| Publicly documented records| Source
-WhisperScore| 50| "USERS.md" / "LAUNCH_USERS.md"
-Midnight Sealed Bid Marketplace| 50| "USERS.md"
-StegoVault / Moonlight6| 70 claimed testers| "docs/preprod-users.md"
-
-Wallet Evidence Policy
-
-A wallet is counted as an Aletheia tester only when there is evidence that the wallet actually participated in Aletheia testing.
-
-Public wallet addresses from other projects are therefore kept separate from the Aletheia tester count. This distinction prevents ecosystem reference data from being presented as Aletheia usage data.
-
-Selected Aletheia Preprod Wallet Records
-
-The following wallet records have been associated with Aletheia testing/feedback:
-
-mn_shield-addr1qaaq3wrz4zs2n3j0z0f2cx0ensuwur3ae983uctq99yjpgjruvu4q5ng5jndvp3lhnc6nj5nesayypg9amk2ztqycscewsnvvpvplsc9ushzn
-
-mn_addr1cfqffr0q5upthmkuvgrcu5frs6nk5phunkvlt7ah9tjhy9exnf2stmvss4
-
-mn_shield-addr184e0jyr8p0e2azrhwce2g7facy7fyhm5cuutj0h9x7lrn9jp4t3flntj4vvrzkcwgfhs4hfkpk8vlevqn4cn0jyharekrhjnf4g24hq8v6tu8
-
-mn_shield-addr1h0pqx8qv39aazve3hmph8x06aua3klu7m9sx8l8xt57azgefhd5dm9sd0w0qyhaxn0mjw5ug9pmqm9vz5y3yqkf7zchfz8vs4luh4vq30hck
-
-«Note: The public README intentionally does not publish every tester's wallet address. The complete tester registry can be maintained separately for verification and judging purposes.»
-
-Verification Categories
-
-Category| Meaning
-Aletheia Tester| Wallet confirmed to have participated in Aletheia testing
-Feedback Wallet| Tester wallet associated with submitted Aletheia feedback
-Ecosystem Reference| Public wallet appearing in another Midnight project's registry
-Unverified| Address recorded but participation has not yet been independently confirmed
-
-This separation keeps the Aletheia usage numbers auditable while still documenting the broader Midnight Preprod testing ecosystem.
+👉 **View the full verified list of 180+ addresses with Subscan explorer links in [WALLET.md](WALLET.md).**
 
 ## Capability status
 

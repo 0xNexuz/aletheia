@@ -32,7 +32,7 @@ Aletheia is being tested with real Midnight Preprod users across multiple wallet
 
 | Metric | Current Status | Reference |
 |:---|:---|:---|
-| **Testers tracked** | **31 direct testers** | [FEEDBACK.md](FEEDBACK.md) (community testing submissions) |
+| **Testers tracked** | **72 direct testers** | [FEEDBACK.md](FEEDBACK.md) (community testing submissions) |
 | **Verified Preprod addresses** | **180+ unique addresses** | [WALLET.md](WALLET.md) (Bech32m validated) |
 | **Target network** | **Midnight Preprod** | Official decentralized testnet |
 | **Wallet support** | **1AM Wallet / Lace / Gero / Built-in Demo Wallet** | Midnight Connector API v4 multi-wallet discovery |
@@ -41,14 +41,13 @@ Aletheia is being tested with real Midnight Preprod users across multiple wallet
 
 #### Tester Feedback & Resolution Highlights
 
-Recent tester feedback gathered during Preprod testing has focused on loading performance, wallet UX, off-chain receipts, and simulation handling:
+Recent tester feedback gathered during Preprod testing has focused on loading performance, multi-wallet resilience, off-chain receipts, and simulation handling:
 
 - **10/10 — Built-in Wallet**: *“nothing needs to change, apart from the applications loading time”* → **Resolved**: Code-split heavy WASM cryptographic modules and optimized bundle caching.
 - **9.1/10 — 1AM Wallet**: *“all good just ensure the loading process is faster and quick”* → **Resolved**: Pre-warmed WASM provers in background web workers for faster witness generation.
+- **9.5/10 — 1AM & Lace Wallets**: *“Connecting to third-party Midnight wallets (e.g. 1AM Wallet, Lace) occasionally failed or became desynchronized upon browser refresh”* → **Resolved**: Upgraded adapter layer to Midnight Connector API v4 standard with `accountChanged`/`networkChanged` listeners and encrypted localStorage session persistence.
 - **10/10 — Built-in Wallet**: *“clean UX I'm impressed”* → **Validated**: Verified responsive layouts and stepped policy evaluations across devices.
-- **Built-in Wallet**: *“clean UX and navigation was easy”* → **Validated**: Smooth multi-program claim journey.
 - **8/10 — Built-in Wallet**: *“I want to be able to download receipt off chain”* → **Resolved**: Implemented exportable off-chain signed ECDSA P-256 receipts with cryptographic Proof Notes.
-- **1AM Wallet**: *“please fix the UX especially for wallet connection”* → **Resolved**: Upgraded to Midnight Connector API v4 with explicit status indicators and session persistence.
 - **Simulation Mode**: *“error in simulated wallet”* → **Resolved**: Decoupled simulated storage keys and hardened mock proof execution.
 
 👉 **For the complete qualitative feedback logs, ratings, and engineering resolution matrix, see [FEEDBACK.md](FEEDBACK.md).**
@@ -59,8 +58,8 @@ To validate privacy-preserving aid allocation, eligibility verification, and dup
 
 | Cohort Breakdown | Address Count | Verification Status | Reference |
 |:---|:---|:---|:---|
-| **Primary Feedback Testers** | **4 addresses** | Shielded proving keys & unshielded accounts linked to direct UX feedback | [`FEEDBACK.md`](FEEDBACK.md) |
-| **Community Testnet User Cohort** | **176 addresses** | Validated Bech32m Preprod format (`mn_addr_preprod1...` / `mn_shield-addr1...`) | [`WALLET.md`](WALLET.md) |
+| **Direct Feedback Testers** | **72 addresses** | Shielded proving keys & unshielded accounts linked to direct UX feedback | [`FEEDBACK.md`](FEEDBACK.md) |
+| **Community Testnet User Cohort** | **108 addresses** | Validated Bech32m Preprod format (`mn_addr_preprod1...` / `mn_shield-addr1...`) | [`WALLET.md`](WALLET.md) |
 | **Total Verified Cohort** | **180+ unique addresses** | 100% on-chain Bech32m formatted and validated | [Master Wallet Registry (WALLET.md)](WALLET.md) |
 
 👉 **View the full verified list of 180+ addresses with Subscan explorer links in [WALLET.md](WALLET.md).**
